@@ -1,0 +1,29 @@
+{
+  "name": "bazaarface-api",
+  "version": "1.0.0",
+  "description": "APIs for bazaarface",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamdeepta/bazaarface-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iamdeepta/bazaarface-api/issues"
+  },
+  "homepage": "https://github.com/iamdeepta/bazaarface-api#readme",
+  "dependencies": {
+    "apollo-server": "^3.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "graphql": "^16.5.0",
+    "mongoose": "^6.3.5",
+    "nodemon": "^2.0.16"
+  }
+}
