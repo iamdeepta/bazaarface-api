@@ -1,7 +1,12 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { UserInputError, AuthenticationError } = require("apollo-server");
+const aws = require("aws-sdk");
+const multer = require("multer");
+const multerS3 = require("multer-s3");
 const dotenv = require("dotenv");
+const ImageResolver = require("./image_resolvers");
+//const { GraphQLUpload } = require("graphql-upload");
 
 dotenv.config();
 
@@ -16,7 +21,44 @@ const checkAuth = require("../../util/check-auth");
 //const { SECRET_KEY } = require("../../config");
 const User = require("../../models/User");
 //const passport = require("passport");
-//const OAuth2Strategy = require("passport-oauth2");
+//const OAuth2Strategy = require("passport-oauth2").Strategy;
+const { OAuth2Client } = require("google-auth-library");
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+aws.config.update({
+  secretAccessKey: process.env.SECRET_ACCESS_KEY,
+  accessKeyId: process.env.ACCESS_KEY_ID,
+  region: process.env.REGION,
+});
+
+const s3 = new aws.S3();
+
+// const region = "us-east-1";
+// const bucketName = "files.bazaarface.com";
+// const dirName = "users_profile_pic";
+// const accessKeyId = process.env.ACCESS_KEY_ID;
+// const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+
+// const s3 = new aws.S3({
+//   region,
+//   accessKeyId,
+//   secretAccessKey,
+//   signatureVersion: "v4",
+// });
+
+// var upload = multer({
+//   storage: multerS3({
+//     s3: s3,
+//     bucket: bucketName + "/" + dirName,
+//     metadata: function (req, file, cb) {
+//       cb(null, { fieldName: file.fieldname });
+//     },
+//     key: function (req, file, cb) {
+//       cb(null, Date.now().toString());
+//     },
+//   }),
+// });
 
 function generateToken(user) {
   //    passport.use(
@@ -42,7 +84,6 @@ function generateToken(user) {
       id: user.id,
       email: user.email,
       isAdmin: user.isAdmin,
-      //   username: user.username,
     },
     process.env.SECRET_KEY,
     { expiresIn: "5d" }
@@ -112,6 +153,7 @@ module.exports = {
       }
     },
   },
+  // Upload: GraphQLUpload,
   Mutation: {
     async login(_, { email, password }) {
       const { errors, valid } = validateLoginInput(email, password);
@@ -229,31 +271,61 @@ module.exports = {
       };
     },
 
+    //google login/signup
+    async googleAuth(parent, { input: { idToken } }, context, info) {
+      const client_id = process.env.GOOGLE_CLIENT_ID;
+      const { payload } = await client.verifyIdToken({
+        idToken: idToken,
+        audience: client_id,
+      });
+
+      if (payload.email_verified) {
+        const user = await User.findOne({
+          email: payload.email,
+        });
+        if (!user) {
+          const newUser = new User({
+            firstname: payload.name.split(" ")[0],
+            lastname: payload.name.split(" ")[1],
+            email: payload.email,
+            profile_image: payload.picture,
+            cover_image: payload.picture,
+            otp: "google_auth",
+            password: Math.floor(Math.random() * 99999999 + 1).toString(),
+            country_code: "N/A",
+            country: "N/A",
+            city: "N/A",
+            phone: "N/A",
+            company_name: "N/A",
+            company_website: "N/A",
+          });
+          await newUser.save();
+          return {
+            message: "Login successful",
+            success: true,
+            token: idToken,
+          };
+        } else {
+          return {
+            message: "Login successful",
+            success: true,
+            token: idToken,
+          };
+        }
+      } else {
+        return {
+          message: "Login unsuccessful",
+          success: false,
+          token: idToken,
+        };
+      }
+    },
+
     //update user
-    async updateUser(
-      _,
-      {
-        updateUserInput: {
-          id,
-          firstname,
-          lastname,
-          country_code,
-          phone,
-          company_name,
-          company_website,
-          country,
-          city,
-          isBuyer,
-          isSeller,
-          profile_image,
-          cover_image,
-        },
-      },
-      context
-    ) {
+    async updateUser(parent, args, context, info) {
       const user_check = checkAuth(context);
-      // Validate user data
-      const { valid, errors } = validateUserUpdateInput(
+      const { userId } = args;
+      const {
         firstname,
         lastname,
         country_code,
@@ -263,30 +335,66 @@ module.exports = {
         country,
         city,
         profile_image,
-        cover_image
-      );
-      if (!valid) {
-        throw new UserInputError("Errors", { errors });
+        cover_image,
+      } = args.updateUserInput;
+
+      const updates = {};
+
+      if (firstname !== undefined) {
+        updates.firstname = firstname;
       }
+      if (lastname !== undefined) {
+        updates.lastname = lastname;
+      }
+      if (country_code !== undefined) {
+        updates.country_code = country_code;
+      }
+      if (phone !== undefined) {
+        updates.phone = phone;
+      }
+      if (company_name !== undefined) {
+        updates.company_name = company_name;
+      }
+      if (company_website !== undefined) {
+        updates.company_website = company_website;
+      }
+      if (country !== undefined) {
+        updates.country = country;
+      }
+      if (city !== undefined) {
+        updates.city = city;
+      }
+      if (profile_image !== undefined) {
+        updates.profile_image = profile_image;
+      }
+      if (cover_image !== undefined) {
+        updates.cover_image = cover_image;
+      }
+
+      // Validate user data
+      //   const { valid, errors } = validateUserUpdateInput(
+      //     firstname,
+      //     lastname,
+      //     country_code,
+      //     phone,
+      //     company_name,
+      //     company_website,
+      //     country,
+      //     city,
+      //     profile_image,
+      //     cover_image
+      //   );
+      //   if (!valid) {
+      //     throw new UserInputError("Errors", { errors });
+      //   }
 
       // TODO: Make sure user doesnt already exist
       try {
-        if (id === user_check.id || user_check.isAdmin) {
+        if (userId === user_check.id || user_check.isAdmin) {
           const updatedUser = await User.findByIdAndUpdate(
-            id,
+            userId,
             {
-              $set: {
-                firstname,
-                lastname,
-                country_code,
-                phone,
-                company_name,
-                company_website,
-                country,
-                city,
-                profile_image,
-                cover_image,
-              },
+              $set: updates,
             },
             { new: true }
           );
@@ -299,7 +407,8 @@ module.exports = {
           throw new AuthenticationError("Action not allowed");
         }
       } catch (err) {
-        throw new UserInputError("Errors", { errors });
+        //throw new UserInputError("Errors", { errors });
+        throw new UserInputError("Errors occcur while updating");
       }
     },
 
@@ -320,6 +429,91 @@ module.exports = {
 
       sendEmail(otp, email);
     },
+
+    //forgot pass otp
+    async getForgotOtp(_, { email, otp }) {
+      if (email.trim() === "") {
+        throw new Error("Email must not be empty");
+      } else {
+        const regEx =
+          /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/;
+        if (!email.match(regEx)) {
+          throw new Error("Email must be a valid email address");
+        }
+      }
+      if (otp.trim() === "") {
+        throw new Error("OTP must be provided");
+      }
+
+      try {
+        const users = await User.findOne({ email: email });
+
+        if (users) {
+          sendEmail(otp, email);
+
+          return {
+            message: "OTP sent to your email.",
+            success: true,
+          };
+        } else {
+          return {
+            message: "Your email is not registered.",
+            success: false,
+          };
+        }
+      } catch (err) {
+        throw new UserInputError("Errors occcur while sending OTP");
+      }
+    },
+
+    //reset password
+    async resetPassword(parent, args, context, info) {
+      //const user_check = checkAuth(context);
+      //const { userId } = args;
+      const { email, password, confirmPassword } = args.input;
+
+      const updates = {};
+
+      if (email !== undefined) {
+        updates.email = email;
+      }
+
+      try {
+        //if (email === user_check.email) {
+        if (password === confirmPassword) {
+          const resetPass = await User.findOneAndUpdate(
+            { email: email },
+            {
+              $set: { password: await bcrypt.hash(password, 12) },
+            },
+            { new: true }
+          );
+          return {
+            message: "Password successfully reset.",
+            success: true,
+          };
+        } else {
+          return {
+            message: "Passwords did not match.",
+            success: false,
+          };
+        }
+        // } else {
+        //   throw new AuthenticationError("Action not allowed");
+        // }
+      } catch (err) {
+        //throw new UserInputError("Errors", { errors });
+        throw new UserInputError("Errors occcur while updating");
+      }
+    },
+
+    //upload profile image
+    uploadObject: (_, { email, file, bucketName }) =>
+      new ImageResolver().uploadObject(email, file, bucketName),
+
+    //upload profile image
+    uploadCoverImage: (_, { email, file, bucketName }) =>
+      new ImageResolver().uploadCoverImage(email, file, bucketName),
 
     //delete user
     async deleteUser(_, { userId }, context) {
