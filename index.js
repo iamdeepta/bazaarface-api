@@ -31,7 +31,7 @@ async function startServer() {
 
   const port = process.env.PORT || 8000;
 
-  mongoose
+  await mongoose
     .connect(process.env.MONGO_URL, { useNewUrlParser: true })
     .then(() => {
       console.log("MongoDB connected");

@@ -511,7 +511,7 @@ module.exports = {
     uploadObject: (_, { email, file, bucketName }) =>
       new ImageResolver().uploadObject(email, file, bucketName),
 
-    //upload profile image
+    //upload cover image
     uploadCoverImage: (_, { email, file, bucketName }) =>
       new ImageResolver().uploadCoverImage(email, file, bucketName),
 

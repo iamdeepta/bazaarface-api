@@ -2,7 +2,7 @@ const { gql } = require("apollo-server");
 //const Object = require("./Object");
 // const Response = require("./Response");
 
-module.exports = gql`
+const user = gql`
   scalar Upload
 
   type Object {
@@ -115,3 +115,5 @@ module.exports = gql`
     uploadCoverImage(email: String!, file: Upload!, bucketName: String!): Object
   }
 `;
+
+module.exports = user;

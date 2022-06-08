@@ -4,6 +4,12 @@ const { extname } = require("path");
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const User = require("../../models/User");
 
+const sharp = require("sharp");
+const { finished } = require("stream");
+
+// Defining finishedAsync method
+const finishedAsync = promisify(finished);
+
 class ImageResolver {
   constructor() {
     this.s3 = s3;
@@ -25,12 +31,6 @@ class ImageResolver {
 
         let fileStream = createReadStream();
 
-        fileStream.on("error", (error) => console.error(error));
-
-        params.Body = fileStream;
-
-        let timestamp = new Date().getTime();
-
         let file_extension = extname(filename);
 
         if (
@@ -38,7 +38,33 @@ class ImageResolver {
           file_extension.toLowerCase() === ".png" ||
           file_extension.toLowerCase() === ".jpeg"
         ) {
-          params.Key = `users_pictures/${timestamp}${file_extension}`;
+          let timestamp = new Date().getTime();
+          var web_file_name = `${timestamp}.webp`;
+
+          //upload file to project folder
+          const out = require("fs").createWriteStream(filename);
+          fileStream.pipe(out);
+          await finishedAsync(fileStream);
+
+          //convert to webp
+          const sharp_webp = await sharp(filename)
+            .toFile(web_file_name)
+            .then((data) => {
+              require("fs").unlinkSync(filename);
+
+              console.log(data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+
+          fileStream = require("fs").createReadStream(web_file_name);
+
+          fileStream.on("error", (error) => console.error(error));
+
+          params.Body = fileStream;
+
+          params.Key = `users_pictures/${web_file_name}`;
 
           let upload = promisify(this.s3.upload.bind(this.s3));
 
@@ -51,6 +77,9 @@ class ImageResolver {
             },
             { new: true }
           );
+
+          require("fs").unlinkSync(web_file_name);
+
           return {
             key: params.Key,
             //   url: result.Location,
@@ -97,12 +126,6 @@ class ImageResolver {
 
         let fileStream = createReadStream();
 
-        fileStream.on("error", (error) => console.error(error));
-
-        params.Body = fileStream;
-
-        let timestamp = new Date().getTime();
-
         let file_extension = extname(filename);
 
         if (
@@ -110,7 +133,33 @@ class ImageResolver {
           file_extension.toLowerCase() === ".png" ||
           file_extension.toLowerCase() === ".jpeg"
         ) {
-          params.Key = `users_pictures/${timestamp}${file_extension}`;
+          let timestamp = new Date().getTime();
+          var web_file_name = `${timestamp}.webp`;
+
+          //upload file to project folder
+          const out = require("fs").createWriteStream(filename);
+          fileStream.pipe(out);
+          await finishedAsync(fileStream);
+
+          //convert to webp
+          const sharp_webp = await sharp(filename)
+            .toFile(web_file_name)
+            .then((data) => {
+              require("fs").unlinkSync(filename);
+
+              console.log(data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+
+          fileStream = require("fs").createReadStream(web_file_name);
+
+          fileStream.on("error", (error) => console.error(error));
+
+          params.Body = fileStream;
+
+          params.Key = `users_pictures/${web_file_name}`;
 
           let upload = promisify(this.s3.upload.bind(this.s3));
 
@@ -123,6 +172,9 @@ class ImageResolver {
             },
             { new: true }
           );
+
+          require("fs").unlinkSync(web_file_name);
+
           return {
             key: params.Key,
             //   url: result.Location,
