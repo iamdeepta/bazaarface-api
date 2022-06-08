@@ -155,5 +155,13 @@ module.exports = {
         file,
         bucketName
       ),
+
+    //delete reference customers image
+    deleteSellerRefCustomersImage: (_, { id, pic_name, bucketName }) =>
+      new SellerImageResolver().deleteSellerRefCustomersImage(
+        id,
+        pic_name,
+        bucketName
+      ),
   },
 };

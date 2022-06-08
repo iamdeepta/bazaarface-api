@@ -4,6 +4,9 @@ const expanseResolvers = require("./expanse");
 const productCategoriesResolvers = require("./productCategories");
 const testimonialsResolvers = require("./testimonials");
 const sellersResolvers = require("./sellers");
+const countriesResolvers = require("./countries");
+const servicesResolvers = require("./services");
+const locationsResolvers = require("./locations");
 
 const {
   GraphQLUpload,
@@ -18,6 +21,9 @@ module.exports = {
     ...productCategoriesResolvers.Query,
     ...testimonialsResolvers.Query,
     ...sellersResolvers.Query,
+    ...countriesResolvers.Query,
+    ...servicesResolvers.Query,
+    ...locationsResolvers.Query,
   },
   Upload: GraphQLUpload,
   Mutation: {
@@ -27,5 +33,8 @@ module.exports = {
     ...productCategoriesResolvers.Mutation,
     ...testimonialsResolvers.Mutation,
     ...sellersResolvers.Mutation,
+    ...countriesResolvers.Mutation,
+    ...servicesResolvers.Mutation,
+    ...locationsResolvers.Mutation,
   },
 };

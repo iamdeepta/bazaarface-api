@@ -11,6 +11,7 @@ const sellers = gql`
     cover_image: String
     key_facts: KeyFacts
     ref_customers: [String]
+    services: [Services]
     message: String
     success: Boolean
   }
@@ -22,6 +23,15 @@ const sellers = gql`
     revenue: String
     production: String
     machinery: String
+    message: String
+    success: Boolean
+  }
+
+  type Services {
+    id: ID!
+    name: String
+    description: String
+    image: String
     message: String
     success: Boolean
   }
@@ -42,9 +52,23 @@ const sellers = gql`
     machinery: String
   }
 
+  input SellerServiceInput {
+    name: String
+    description: String
+    file: Upload!
+    bucketName: String!
+  }
+
+  input SellerServiceUpdateInput {
+    name: String
+    description: String
+  }
+
   type Query {
     getSellers: [Sellers]
     getSeller(id: ID!): Sellers
+    getSellerServices: [Services]
+    getSellerService(id: ID!): Services
   }
 
   type Mutation {
@@ -61,6 +85,24 @@ const sellers = gql`
       id: ID!
       pic_name: String!
       file: Upload!
+      bucketName: String!
+    ): successInfoSeller
+    deleteSellerRefCustomersImage(
+      id: ID!
+      pic_name: String!
+      bucketName: String!
+    ): successInfoSeller
+
+    createSellerService(user_id: ID!, input: SellerServiceInput): Services
+    updateSellerService(id: ID, input: SellerServiceUpdateInput): Services
+    updateSellerServiceImage(
+      id: ID!
+      file: Upload!
+      bucketName: String!
+    ): Services
+    deleteSellerService(
+      id: ID!
+      pic_name: String!
       bucketName: String!
     ): successInfoSeller
   }

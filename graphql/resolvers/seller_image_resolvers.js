@@ -387,7 +387,7 @@ class SellerImageResolver {
         }
       } else {
         return {
-        //   ...pro_pic._doc,
+          //   ...pro_pic._doc,
           //   url: result.Location,
           message: "Please select an image",
           success: false,
@@ -396,6 +396,39 @@ class SellerImageResolver {
       // } else {
       //   throw new AuthenticationError("Action not allowed");
       // }
+    } catch (err) {
+      throw new UserInputError("Errors occcur while updating");
+    }
+  }
+
+  //delete reference customers image
+  async deleteSellerRefCustomersImage(id, pic_name, bucketName) {
+    // create an object to hold the name of the bucket, and the key of an object.
+    const params = {
+      Bucket: bucketName,
+      Key: pic_name,
+    };
+
+    try {
+      // promisify the deleteObject() so that we can use the async/await syntax.
+      let removeObject = promisify(this.s3.deleteObject.bind(this.s3));
+
+      // remove the object.
+      await removeObject(params).catch(console.log);
+
+      const pro_pic = await Seller.updateOne(
+        { user_id: id },
+        {
+          $pull: { ref_customers: pic_name },
+        },
+        { new: true }
+      );
+
+      // send back a response to the client.
+      return {
+        message: "Reference image successfully deleted.",
+        success: true,
+      };
     } catch (err) {
       throw new UserInputError("Errors occcur while updating");
     }
