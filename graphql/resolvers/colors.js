@@ -5,28 +5,28 @@ dotenv.config();
 
 const checkAuth = require("../../util/check-auth");
 
-const HeaderCategory = require("../../models/HeaderCategory");
+const Color = require("../../models/Color");
 
 module.exports = {
   Query: {
-    async getHeaderCategories(parent, args, context) {
+    async getColors(parent, args, context) {
       try {
-        const header_category = await HeaderCategory.find().sort({
+        const color = await Color.find().sort({
           createdAt: -1,
         });
 
-        return header_category;
+        return color;
       } catch (err) {
         throw new Error(err);
       }
     },
-    async getHeaderCategory(_, { id }, context) {
+    async getColor(_, { id }, context) {
       try {
-        const header_category = await HeaderCategory.findById(id);
-        if (header_category) {
-          return header_category;
+        const color = await Color.findById(id);
+        if (color) {
+          return color;
         } else {
-          throw new Error("Header Category not found");
+          throw new Error("Color not found");
         }
       } catch (err) {
         throw new Error(err);
@@ -36,27 +36,27 @@ module.exports = {
   // Upload: GraphQLUpload,
 
   Mutation: {
-    //create header category
-    async createHeaderCategory(_, { input: { name } }, context) {
+    //create color
+    async createColor(_, { input: { name, code } }, context) {
       const user_check = checkAuth(context);
       try {
         if (user_check.isAdmin) {
-          if (name !== undefined || name.trim() !== "") {
-            const newHeaderCategory = new HeaderCategory({ name });
+          if (name.trim() !== "" || code.trim() !== "") {
+            const color = new Color({ name, code });
 
-            const res = await newHeaderCategory.save();
+            const res = await color.save();
 
             return {
               ...res._doc,
               id: res._id,
-              message: "Category is created successfully.",
+              message: "Color is created successfully.",
               success: true,
             };
           } else {
             return {
               ...res._doc,
               id: res._id,
-              message: "Category name must not be empty.",
+              message: "Fill up all the fields.",
               success: false,
             };
           }
@@ -64,31 +64,30 @@ module.exports = {
           throw new AuthenticationError("Action not allowed");
         }
       } catch (err) {
-        throw new UserInputError("Errors occcur while updating");
+        throw new UserInputError("Errors occcur while creating");
       }
     },
 
-    //update header category
-    async updateHeaderCategory(parent, args, context, info) {
+    //update color
+    async updateColor(parent, args, context, info) {
       const user_check = checkAuth(context);
       const { id } = args;
-      const { name } = args.input;
+      const { name, code } = args.input;
 
       const updates = {};
 
-      if (name !== undefined || name.trim() !== "") {
+      if (name !== undefined) {
         updates.name = name;
-      } else {
-        return {
-          message: "Category name must not be empty.",
-          success: true,
-        };
+      }
+
+      if (code !== undefined) {
+        updates.code = code;
       }
 
       // TODO: Make sure user doesnt already exist
       try {
         if (user_check.isAdmin) {
-          const updatedHeaderCategory = await HeaderCategory.findByIdAndUpdate(
+          const color = await Color.findByIdAndUpdate(
             id,
             {
               $set: updates,
@@ -96,9 +95,9 @@ module.exports = {
             { new: true }
           );
           return {
-            ...updatedHeaderCategory._doc,
-            id: updatedHeaderCategory._id,
-            message: "Category is updated successfully.",
+            ...color._doc,
+            id: color._id,
+            message: "Color is updated successfully.",
             success: true,
           };
         } else {
@@ -110,15 +109,15 @@ module.exports = {
       }
     },
 
-    //delete header category
-    async deleteHeaderCategory(_, { id }, context) {
+    //delete color
+    async deleteColor(_, { id }, context) {
       const user = checkAuth(context);
 
       try {
-        const header_category = await HeaderCategory.findById(id);
+        const color = await Color.findById(id);
         if (user.isAdmin) {
-          await header_category.delete();
-          return { message: "Category deleted successfully", success: true };
+          await color.delete();
+          return { message: "Color deleted successfully", success: true };
         } else {
           throw new AuthenticationError("Action not allowed");
         }

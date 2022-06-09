@@ -6,6 +6,11 @@ const testimonial = require("./testimonials");
 const seller = require("./sellers");
 const country = require("./countries");
 const location = require("./locations");
+const color = require("./colors");
+const size = require("./sizes");
+const adType = require("./adTypes");
+const product = require("./products");
+const ad = require("./ads");
 
 const schemaArray = [
   user,
@@ -16,6 +21,11 @@ const schemaArray = [
   seller,
   country,
   location,
+  color,
+  size,
+  adType,
+  product,
+  ad,
 ];
 
 module.exports = schemaArray;

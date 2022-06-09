@@ -7,6 +7,11 @@ const sellersResolvers = require("./sellers");
 const countriesResolvers = require("./countries");
 const servicesResolvers = require("./services");
 const locationsResolvers = require("./locations");
+const colorsResolvers = require("./colors");
+const sizesResolvers = require("./sizes");
+const adTypesResolvers = require("./adTypes");
+const productsResolvers = require("./products");
+const adsResolvers = require("./ads");
 
 const {
   GraphQLUpload,
@@ -24,6 +29,11 @@ module.exports = {
     ...countriesResolvers.Query,
     ...servicesResolvers.Query,
     ...locationsResolvers.Query,
+    ...colorsResolvers.Query,
+    ...sizesResolvers.Query,
+    ...adTypesResolvers.Query,
+    ...productsResolvers.Query,
+    ...adsResolvers.Query,
   },
   Upload: GraphQLUpload,
   Mutation: {
@@ -36,5 +46,10 @@ module.exports = {
     ...countriesResolvers.Mutation,
     ...servicesResolvers.Mutation,
     ...locationsResolvers.Mutation,
+    ...colorsResolvers.Mutation,
+    ...sizesResolvers.Mutation,
+    ...adTypesResolvers.Mutation,
+    ...productsResolvers.Mutation,
+    ...adsResolvers.Mutation,
   },
 };

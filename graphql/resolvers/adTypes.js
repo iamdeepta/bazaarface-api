@@ -5,28 +5,28 @@ dotenv.config();
 
 const checkAuth = require("../../util/check-auth");
 
-const HeaderCategory = require("../../models/HeaderCategory");
+const AdType = require("../../models/AdType");
 
 module.exports = {
   Query: {
-    async getHeaderCategories(parent, args, context) {
+    async getAdTypes(parent, args, context) {
       try {
-        const header_category = await HeaderCategory.find().sort({
+        const adType = await AdType.find().sort({
           createdAt: -1,
         });
 
-        return header_category;
+        return adType;
       } catch (err) {
         throw new Error(err);
       }
     },
-    async getHeaderCategory(_, { id }, context) {
+    async getAdType(_, { id }, context) {
       try {
-        const header_category = await HeaderCategory.findById(id);
-        if (header_category) {
-          return header_category;
+        const adType = await AdType.findById(id);
+        if (adType) {
+          return adType;
         } else {
-          throw new Error("Header Category not found");
+          throw new Error("Ad Type not found");
         }
       } catch (err) {
         throw new Error(err);
@@ -36,27 +36,27 @@ module.exports = {
   // Upload: GraphQLUpload,
 
   Mutation: {
-    //create header category
-    async createHeaderCategory(_, { input: { name } }, context) {
+    //create ad type
+    async createAdType(_, { input: { name, price } }, context) {
       const user_check = checkAuth(context);
       try {
         if (user_check.isAdmin) {
-          if (name !== undefined || name.trim() !== "") {
-            const newHeaderCategory = new HeaderCategory({ name });
+          if (name.trim() !== "" || price.toString().trim() !== "") {
+            const adType = new AdType({ name, price });
 
-            const res = await newHeaderCategory.save();
+            const res = await adType.save();
 
             return {
               ...res._doc,
               id: res._id,
-              message: "Category is created successfully.",
+              message: "Ad type is created successfully.",
               success: true,
             };
           } else {
             return {
               ...res._doc,
               id: res._id,
-              message: "Category name must not be empty.",
+              message: "Fill up all the fields.",
               success: false,
             };
           }
@@ -64,31 +64,30 @@ module.exports = {
           throw new AuthenticationError("Action not allowed");
         }
       } catch (err) {
-        throw new UserInputError("Errors occcur while updating");
+        throw new UserInputError("Errors occcur while creating");
       }
     },
 
-    //update header category
-    async updateHeaderCategory(parent, args, context, info) {
+    //update ad type
+    async updateAdType(parent, args, context, info) {
       const user_check = checkAuth(context);
       const { id } = args;
-      const { name } = args.input;
+      const { name, price } = args.input;
 
       const updates = {};
 
-      if (name !== undefined || name.trim() !== "") {
+      if (name !== undefined) {
         updates.name = name;
-      } else {
-        return {
-          message: "Category name must not be empty.",
-          success: true,
-        };
+      }
+
+      if (price !== undefined) {
+        updates.price = price;
       }
 
       // TODO: Make sure user doesnt already exist
       try {
         if (user_check.isAdmin) {
-          const updatedHeaderCategory = await HeaderCategory.findByIdAndUpdate(
+          const adType = await AdType.findByIdAndUpdate(
             id,
             {
               $set: updates,
@@ -96,9 +95,9 @@ module.exports = {
             { new: true }
           );
           return {
-            ...updatedHeaderCategory._doc,
-            id: updatedHeaderCategory._id,
-            message: "Category is updated successfully.",
+            ...adType._doc,
+            id: adType._id,
+            message: "Ad type is updated successfully.",
             success: true,
           };
         } else {
@@ -110,15 +109,15 @@ module.exports = {
       }
     },
 
-    //delete header category
-    async deleteHeaderCategory(_, { id }, context) {
+    //delete ad type
+    async deleteAdType(_, { id }, context) {
       const user = checkAuth(context);
 
       try {
-        const header_category = await HeaderCategory.findById(id);
+        const adType = await AdType.findById(id);
         if (user.isAdmin) {
-          await header_category.delete();
-          return { message: "Category deleted successfully", success: true };
+          await adType.delete();
+          return { message: "Ad type deleted successfully", success: true };
         } else {
           throw new AuthenticationError("Action not allowed");
         }

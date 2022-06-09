@@ -5,28 +5,28 @@ dotenv.config();
 
 const checkAuth = require("../../util/check-auth");
 
-const HeaderCategory = require("../../models/HeaderCategory");
+const Size = require("../../models/Size");
 
 module.exports = {
   Query: {
-    async getHeaderCategories(parent, args, context) {
+    async getSizes(parent, args, context) {
       try {
-        const header_category = await HeaderCategory.find().sort({
+        const size = await Size.find().sort({
           createdAt: -1,
         });
 
-        return header_category;
+        return size;
       } catch (err) {
         throw new Error(err);
       }
     },
-    async getHeaderCategory(_, { id }, context) {
+    async getSize(_, { id }, context) {
       try {
-        const header_category = await HeaderCategory.findById(id);
-        if (header_category) {
-          return header_category;
+        const size = await Size.findById(id);
+        if (size) {
+          return size;
         } else {
-          throw new Error("Header Category not found");
+          throw new Error("Size not found");
         }
       } catch (err) {
         throw new Error(err);
@@ -36,27 +36,27 @@ module.exports = {
   // Upload: GraphQLUpload,
 
   Mutation: {
-    //create header category
-    async createHeaderCategory(_, { input: { name } }, context) {
+    //create size
+    async createSize(_, { input: { name } }, context) {
       const user_check = checkAuth(context);
       try {
         if (user_check.isAdmin) {
-          if (name !== undefined || name.trim() !== "") {
-            const newHeaderCategory = new HeaderCategory({ name });
+          if (name.trim() !== "") {
+            const size = new Size({ name });
 
-            const res = await newHeaderCategory.save();
+            const res = await size.save();
 
             return {
               ...res._doc,
               id: res._id,
-              message: "Category is created successfully.",
+              message: "Size is created successfully.",
               success: true,
             };
           } else {
             return {
               ...res._doc,
               id: res._id,
-              message: "Category name must not be empty.",
+              message: "Fill up all the fields.",
               success: false,
             };
           }
@@ -64,31 +64,26 @@ module.exports = {
           throw new AuthenticationError("Action not allowed");
         }
       } catch (err) {
-        throw new UserInputError("Errors occcur while updating");
+        throw new UserInputError("Errors occcur while creating");
       }
     },
 
-    //update header category
-    async updateHeaderCategory(parent, args, context, info) {
+    //update size
+    async updateSize(parent, args, context, info) {
       const user_check = checkAuth(context);
       const { id } = args;
       const { name } = args.input;
 
       const updates = {};
 
-      if (name !== undefined || name.trim() !== "") {
+      if (name !== undefined) {
         updates.name = name;
-      } else {
-        return {
-          message: "Category name must not be empty.",
-          success: true,
-        };
       }
 
       // TODO: Make sure user doesnt already exist
       try {
         if (user_check.isAdmin) {
-          const updatedHeaderCategory = await HeaderCategory.findByIdAndUpdate(
+          const size = await Size.findByIdAndUpdate(
             id,
             {
               $set: updates,
@@ -96,9 +91,9 @@ module.exports = {
             { new: true }
           );
           return {
-            ...updatedHeaderCategory._doc,
-            id: updatedHeaderCategory._id,
-            message: "Category is updated successfully.",
+            ...size._doc,
+            id: size._id,
+            message: "Size is updated successfully.",
             success: true,
           };
         } else {
@@ -110,15 +105,15 @@ module.exports = {
       }
     },
 
-    //delete header category
-    async deleteHeaderCategory(_, { id }, context) {
+    //delete size
+    async deleteSize(_, { id }, context) {
       const user = checkAuth(context);
 
       try {
-        const header_category = await HeaderCategory.findById(id);
+        const size = await Size.findById(id);
         if (user.isAdmin) {
-          await header_category.delete();
-          return { message: "Category deleted successfully", success: true };
+          await size.delete();
+          return { message: "Size deleted successfully", success: true };
         } else {
           throw new AuthenticationError("Action not allowed");
         }
