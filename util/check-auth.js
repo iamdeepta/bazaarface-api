@@ -24,24 +24,38 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 //     email: payload.email,
 //   });
 
-//   return { ...payload, id: user_single.id, isAdmin: user_single.isAdmin };
+//   console.log(user_single);
+
+//   //return { ...payload, id: user_single.id, isAdmin: user_single.isAdmin };
 //   //console.log(payload);
 //   //const userid = payload["sub"];
 //   // If request specified a G Suite domain:
 //   // const domain = payload['hd'];
 // }
 
-module.exports = (context) => {
+module.exports = async (context) => {
   // context = { ... headers }
   const authHeader = context.req.headers.authorization;
+
   if (authHeader) {
     // Bearer ....
     const token = authHeader.split("Bearer ")[1];
 
+    const user_single = await User.findOne({
+      token: token,
+    });
+    // .then((data) => console.log(data))
+    // .catch((err) => console.log(err));
+
     if (token) {
       try {
-        const user = jwt.verify(token, process.env.SECRET_KEY);
-        return user;
+        if (user_single) {
+          //console.log({ ...user_single._doc, id: user_single._id });
+          return { ...user_single._doc, id: user_single._id.toString() };
+        } else {
+          const user = jwt.verify(token, process.env.SECRET_KEY);
+          return user;
+        }
       } catch (err) {
         throw new AuthenticationError("Invalid/Expired token");
       }

@@ -136,7 +136,8 @@ module.exports = {
       }
     },
     async getUser(_, { userId }, context) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
+
       try {
         const user = await User.findById(userId);
         if (user) {
@@ -279,6 +280,12 @@ module.exports = {
         audience: client_id,
       });
 
+      //hash pass
+      const password = await bcrypt.hash(
+        Math.floor(Math.random() * 99999999 + 1).toString(),
+        12
+      );
+
       if (payload.email_verified) {
         const user = await User.findOne({
           email: payload.email,
@@ -291,7 +298,8 @@ module.exports = {
             profile_image: payload.picture,
             cover_image: payload.picture,
             otp: "google_auth",
-            password: Math.floor(Math.random() * 99999999 + 1).toString(),
+            token: idToken,
+            password: password,
             country_code: "N/A",
             country: "N/A",
             city: "N/A",
@@ -314,7 +322,7 @@ module.exports = {
         }
       } else {
         return {
-          message: "Login unsuccessful",
+          message: "Login unsuccessful. Verify your email first.",
           success: false,
           token: idToken,
         };
