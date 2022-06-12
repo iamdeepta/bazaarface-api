@@ -16,6 +16,7 @@ const userSchema = new Schema(
     city: { type: String, required: true },
     isBuyer: { type: Boolean, default: false },
     isSeller: { type: Boolean, default: false },
+    user_type: { type: String, default: "" },
     profile_image: { type: String, default: null },
     cover_image: { type: String, default: null },
     isAdmin: { type: Boolean, default: false },

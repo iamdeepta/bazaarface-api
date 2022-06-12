@@ -12,6 +12,10 @@ const sellers = gql`
     key_facts: KeyFacts
     ref_customers: [String]
     services: [Services]
+    followers: [String]
+    following: [String]
+    total_followers: Int
+    total_following: Int
     message: String
     success: Boolean
   }
@@ -34,6 +38,11 @@ const sellers = gql`
     image: String
     message: String
     success: Boolean
+  }
+
+  type SellersFollowersList {
+    name: String
+    profile_image: String
   }
 
   type successInfoSeller {
@@ -69,6 +78,7 @@ const sellers = gql`
     getSeller(id: ID!): Sellers
     getSellerServices: [Services]
     getSellerService(id: ID!): Services
+    getSellerFollowersList(id: ID!): [SellersFollowersList]
   }
 
   type Mutation {
@@ -105,6 +115,9 @@ const sellers = gql`
       pic_name: String!
       bucketName: String!
     ): successInfoSeller
+
+    updateSellerFollowers(id: ID!, follow_id: ID!, user_id: ID!): Sellers
+    updateSellerUnfollow(id: ID!, follow_id: ID!, user_id: ID!): Sellers
   }
 `;
 
