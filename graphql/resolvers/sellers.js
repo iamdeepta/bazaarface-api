@@ -7,6 +7,7 @@ dotenv.config();
 const checkAuth = require("../../util/check-auth");
 
 const Seller = require("../../models/Seller");
+const Buyer = require("../../models/Buyer");
 const User = require("../../models/User");
 
 module.exports = {
@@ -199,15 +200,30 @@ module.exports = {
       // TODO: Make sure user doesnt already exist
       try {
         if (user_check.id === user_id) {
-          const des = await Seller.findByIdAndUpdate(
-            id,
-            {
-              $push: { followers: { $each: [follow_id], $position: 0 } },
-              $inc: { total_followers: 1 },
-            },
+          const find_seller = await Seller.findOne({ _id: id });
+          var des;
 
-            { new: true }
-          );
+          if (find_seller) {
+            des = await Seller.findByIdAndUpdate(
+              id,
+              {
+                $push: { followers: { $each: [follow_id], $position: 0 } },
+                $inc: { total_followers: 1 },
+              },
+
+              { new: true }
+            );
+          } else {
+            des = await Buyer.findByIdAndUpdate(
+              id,
+              {
+                $push: { followers: { $each: [follow_id], $position: 0 } },
+                $inc: { total_followers: 1 },
+              },
+
+              { new: true }
+            );
+          }
 
           const following = await Seller.findByIdAndUpdate(
             follow_id,
@@ -243,15 +259,30 @@ module.exports = {
       // TODO: Make sure user doesnt already exist
       try {
         if (user_check.id === user_id) {
-          const des = await Seller.findByIdAndUpdate(
-            id,
-            {
-              $pull: { followers: follow_id },
-              $inc: { total_followers: -1 },
-            },
+          const find_seller = await Seller.findOne({ _id: id });
+          var des;
 
-            { new: true }
-          );
+          if (find_seller) {
+            des = await Seller.findByIdAndUpdate(
+              id,
+              {
+                $pull: { followers: follow_id },
+                $inc: { total_followers: -1 },
+              },
+
+              { new: true }
+            );
+          } else {
+            des = await Buyer.findByIdAndUpdate(
+              id,
+              {
+                $pull: { followers: follow_id },
+                $inc: { total_followers: -1 },
+              },
+
+              { new: true }
+            );
+          }
 
           const following = await Seller.findByIdAndUpdate(
             follow_id,

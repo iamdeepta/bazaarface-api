@@ -11,6 +11,7 @@ const size = require("./sizes");
 const adType = require("./adTypes");
 const product = require("./products");
 const ad = require("./ads");
+const buyer = require("./buyers");
 
 const schemaArray = [
   user,
@@ -26,6 +27,7 @@ const schemaArray = [
   adType,
   product,
   ad,
+  buyer,
 ];
 
 module.exports = schemaArray;
