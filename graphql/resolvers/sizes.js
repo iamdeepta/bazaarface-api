@@ -38,7 +38,7 @@ module.exports = {
   Mutation: {
     //create size
     async createSize(_, { input: { name } }, context) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       try {
         if (user_check.isAdmin) {
           if (name.trim() !== "") {
@@ -70,7 +70,7 @@ module.exports = {
 
     //update size
     async updateSize(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { name } = args.input;
 
@@ -107,7 +107,7 @@ module.exports = {
 
     //delete size
     async deleteSize(_, { id }, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
 
       try {
         const size = await Size.findById(id);

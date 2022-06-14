@@ -38,7 +38,7 @@ module.exports = {
   Mutation: {
     //create ad type
     async createAdType(_, { input: { name, price } }, context) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       try {
         if (user_check.isAdmin) {
           if (name.trim() !== "" || price.toString().trim() !== "") {
@@ -70,7 +70,7 @@ module.exports = {
 
     //update ad type
     async updateAdType(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { name, price } = args.input;
 
@@ -111,7 +111,7 @@ module.exports = {
 
     //delete ad type
     async deleteAdType(_, { id }, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
 
       try {
         const adType = await AdType.findById(id);

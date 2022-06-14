@@ -6,6 +6,7 @@ const Ad = require("../../models/Ad");
 
 const sharp = require("sharp");
 const { finished } = require("stream");
+const { trusted } = require("mongoose");
 
 // Defining finishedAsync method
 const finishedAsync = promisify(finished);

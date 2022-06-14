@@ -55,7 +55,7 @@ module.exports = {
 
     //update testimonial
     async updateTestimonial(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { name, comment, designation } = args.input;
 
@@ -109,7 +109,7 @@ module.exports = {
 
     //delete testimonial
     async deleteTestimonial(_, { id }, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
 
       try {
         const testi = await Testimonial.findById(id);

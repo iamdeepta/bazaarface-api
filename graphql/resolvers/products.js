@@ -146,7 +146,7 @@ module.exports = {
 
     //update product
     async updateProduct(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const {
         name,

@@ -18,6 +18,8 @@ const ads = gql`
     type: String
     ad_for: String
     image: [String]
+    user: User
+    createdAt: String
     message: String
     success: Boolean
   }
@@ -25,6 +27,40 @@ const ads = gql`
   type successInfoAds {
     message: String
     success: Boolean
+  }
+
+  type MoreLikeThisAd {
+    name: String
+    location: String
+    price: String
+    quantity: String
+    type: String
+    ad_for: String
+    image: [String]
+    adtypes: [AdTypes]
+  }
+
+  type AdTypes {
+    name: String
+  }
+
+  type User {
+    firstname: String
+    lastname: String
+    company_name: String
+    city: String
+    profile_image: String
+    seller: Seller
+    buyer: Buyer
+  }
+
+  type Seller {
+    profile_image: String
+  }
+
+  type Buyer {
+    profile_image: String
+    designation: String
   }
 
   input AdInput {
@@ -60,6 +96,18 @@ const ads = gql`
   type Query {
     getAds: [Ads]
     getAd(id: ID!): Ads
+    getTenAds: [Ads]
+    getAdDetail(id: ID!): Ads
+    getAdMoreLikeThis(category_id: ID!): [MoreLikeThisAd]
+    getAdFilter(
+      category_id: ID
+      ad_for: String
+      sort_by: String
+      user_type: String
+      type: String
+      country: String
+      search_text: String
+    ): [MoreLikeThisAd]
   }
 
   type Mutation {

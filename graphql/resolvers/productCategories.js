@@ -53,7 +53,7 @@ module.exports = {
 
     //update product category
     async updateProductCategory(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { name } = args.input;
 
@@ -105,7 +105,7 @@ module.exports = {
 
     //delete product category
     async deleteProductCategory(_, { id }, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
 
       try {
         const product_category = await ProductCategory.findById(id);

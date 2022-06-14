@@ -7,6 +7,11 @@ dotenv.config();
 const checkAuth = require("../../util/check-auth");
 
 const Ad = require("../../models/Ad");
+const User = require("../../models/User");
+const Seller = require("../../models/Seller");
+const Buyer = require("../../models/Buyer");
+const Country = require("../../models/Country");
+const AdType = require("../../models/AdType");
 
 module.exports = {
   Query: {
@@ -21,9 +26,185 @@ module.exports = {
         throw new Error(err);
       }
     },
+
+    //ten ads
+    async getTenAds(parent, args, context) {
+      try {
+        const ad = await Ad.find()
+          .sort({
+            createdAt: -1,
+          })
+          .limit(10);
+
+        return ad;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
     async getAd(_, { id }, context) {
       try {
         const ad = await Ad.findOne({ _id: id });
+        if (ad) {
+          return ad;
+        } else {
+          throw new Error("Ad not found");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //ad detail
+    async getAdDetail(_, { id }, context) {
+      try {
+        const ad = await Ad.findOne({ _id: id });
+        const user = await User.findOne({ _id: ad.user_id });
+        const country = await Country.findOne({ _id: ad.country });
+        if (ad && user) {
+          var seller;
+          var buyer;
+          if (user.user_type === "Seller") {
+            seller = await Seller.findOne({ user_id: ad.user_id });
+          } else {
+            buyer = await Buyer.findOne({ user_id: ad.user_id });
+          }
+
+          if (buyer === undefined) {
+            return {
+              ...ad._doc,
+              country: country.name,
+              user: {
+                firstname: user.firstname,
+                lastname: user.lastname,
+                company_name: user.company_name,
+                city: user.city,
+                profile_image: user.profile_image,
+                seller: {
+                  profile_image: seller.profile_image,
+                },
+              },
+            };
+          } else if (seller === undefined) {
+            return {
+              ...ad._doc,
+              user: {
+                firstname: user.firstname,
+                lastname: user.lastname,
+                company_name: user.company_name,
+                city: user.city,
+                country: user.country,
+                profile_image: user.profile_image,
+                phone: user.phone,
+                buyer: {
+                  profile_image: buyer.profile_image,
+                  designation: buyer.designation,
+                },
+              },
+            };
+          }
+        } else {
+          throw new Error("Ad not found");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //get more like this ad
+    async getAdMoreLikeThis(_, { category_id }, context) {
+      try {
+        const ad = await Ad.aggregate([
+          { $match: { category: category_id } },
+          { $addFields: { type: { $toObjectId: "$type" } } },
+          {
+            $lookup: {
+              from: "adtypes",
+              localField: "type",
+              foreignField: "_id",
+              as: "adtypes",
+            },
+          },
+        ]);
+
+        if (ad) {
+          return ad;
+        } else {
+          throw new Error("Ad not found");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //filter ad
+    async getAdFilter(
+      _,
+      { category_id, ad_for, sort_by, user_type, type, country, search_text },
+      context
+    ) {
+      var updates = {};
+      var sorts = {};
+
+      if (category_id !== "" && category_id !== undefined) {
+        updates.category = category_id;
+      }
+      if (ad_for !== "" && ad_for !== undefined) {
+        updates.ad_for = ad_for;
+      }
+      if (user_type !== "" && user_type !== undefined) {
+        updates.user_type = user_type;
+      }
+      if (type !== "" && type !== undefined) {
+        updates.type = type;
+      }
+      if (country !== "" && country !== undefined) {
+        updates.country = country;
+      }
+
+      if (sort_by !== "" && sort_by !== undefined) {
+        if (sort_by === "price_high") {
+          sorts.price = -1;
+        } else if (sort_by === "price_low") {
+          sorts.price = 1;
+        } else if (sort_by === "date_new") {
+          sorts.createdAt = -1;
+        } else if (sort_by === "date_old") {
+          sorts.createdAt = 0;
+        }
+      } else {
+        sorts.createdAt = -1;
+      }
+
+      try {
+        var ad;
+        if (search_text !== undefined && search_text !== "") {
+          ad = await Ad.aggregate([
+            { $match: { $text: { $search: search_text } } },
+            { $addFields: { type: { $toObjectId: "$type" } } },
+            {
+              $lookup: {
+                from: "adtypes",
+                localField: "type",
+                foreignField: "_id",
+                as: "adtypes",
+              },
+            },
+          ]).sort(sorts);
+        } else {
+          ad = await Ad.aggregate([
+            { $match: updates },
+            { $addFields: { type: { $toObjectId: "$type" } } },
+            {
+              $lookup: {
+                from: "adtypes",
+                localField: "type",
+                foreignField: "_id",
+                as: "adtypes",
+              },
+            },
+          ]).sort(sorts);
+        }
+
         if (ad) {
           return ad;
         } else {
@@ -78,7 +259,7 @@ module.exports = {
 
     //update ad
     async updateAd(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const {
         name,

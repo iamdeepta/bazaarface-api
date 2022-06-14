@@ -6,6 +6,7 @@ const buyerSchema = new Schema(
     email: { type: String, default: null },
     profile_image: { type: String, default: null },
     cover_image: { type: String, default: null },
+    designation: { type: String, default: null },
     isAdmin: { type: Boolean, default: false },
     followers: { type: Array, default: [] },
     following: { type: Array, default: [] },

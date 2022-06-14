@@ -34,7 +34,7 @@ class TestimonialImageResolver {
       //   ACL: "public-read",
     };
 
-    const user_check = checkAuth(context);
+    const user_check = await checkAuth(context);
 
     try {
       if (user_check.isAdmin) {
@@ -139,7 +139,7 @@ class TestimonialImageResolver {
       //   ACL: "public-read",
     };
 
-    const user_check = checkAuth(context);
+    const user_check = await checkAuth(context);
 
     try {
       if (user_check.isAdmin) {

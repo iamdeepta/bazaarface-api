@@ -65,7 +65,7 @@ module.exports = {
   Mutation: {
     //update seller description
     async updateSellerDescription(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { description } = args.input;
 
@@ -107,7 +107,7 @@ module.exports = {
 
     //update seller key facts
     async updateKeyFact(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { founded, employees, revenue, production, machinery } = args.input;
 

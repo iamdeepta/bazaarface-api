@@ -55,7 +55,7 @@ module.exports = {
 
     //update seller service
     async updateSellerService(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { name, description } = args.input;
 

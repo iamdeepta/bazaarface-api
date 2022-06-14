@@ -28,7 +28,7 @@ module.exports = {
       { input: { countries, product_sample, companies, business_contacts } },
       context
     ) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       try {
         if (user_check.isAdmin) {
           if (countries !== undefined || countries.trim() !== "") {
@@ -65,7 +65,7 @@ module.exports = {
 
     //update expanse
     async updateExpanse(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { countries, product_sample, companies, business_contacts } =
         args.input;

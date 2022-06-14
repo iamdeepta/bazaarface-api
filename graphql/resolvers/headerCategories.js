@@ -38,7 +38,7 @@ module.exports = {
   Mutation: {
     //create header category
     async createHeaderCategory(_, { input: { name } }, context) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       try {
         if (user_check.isAdmin) {
           if (name !== undefined || name.trim() !== "") {
@@ -70,7 +70,7 @@ module.exports = {
 
     //update header category
     async updateHeaderCategory(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { name } = args.input;
 
@@ -112,7 +112,7 @@ module.exports = {
 
     //delete header category
     async deleteHeaderCategory(_, { id }, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
 
       try {
         const header_category = await HeaderCategory.findById(id);

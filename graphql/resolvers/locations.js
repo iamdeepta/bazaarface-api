@@ -53,7 +53,7 @@ module.exports = {
       },
       context
     ) {
-      //const user_check = checkAuth(context);
+      //const user_check = await checkAuth(context);
       try {
         //if (user_check.isAdmin) {
         if (office.trim() !== "" || address.trim() !== "") {
@@ -94,7 +94,7 @@ module.exports = {
 
     //update seller location
     async updateSellerLocation(parent, args, context, info) {
-      //const user_check = checkAuth(context);
+      //const user_check = await checkAuth(context);
       const { id } = args;
       const {
         office,
@@ -163,7 +163,7 @@ module.exports = {
 
     //delete location
     async deleteSellerLocation(_, { id }, context) {
-      //const user = checkAuth(context);
+      //const user = await checkAuth(context);
 
       try {
         const location = await Location.findById(id);

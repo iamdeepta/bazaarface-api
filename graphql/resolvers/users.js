@@ -123,7 +123,7 @@ const sendEmail = (otp, user_email) => {
 module.exports = {
   Query: {
     async getUsers(parent, data, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
       try {
         const users = await User.find().sort({ createdAt: -1 });
         if (user.isAdmin) {
@@ -136,7 +136,7 @@ module.exports = {
       }
     },
     async getUser(_, { userId }, context) {
-      const user_check = await checkAuth(context);
+      const user_check = await await checkAuth(context);
 
       try {
         const user = await User.findById(userId);
@@ -331,7 +331,7 @@ module.exports = {
 
     //update user
     async updateUser(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { userId } = args;
       const {
         firstname,
@@ -476,7 +476,7 @@ module.exports = {
 
     //reset password
     async resetPassword(parent, args, context, info) {
-      //const user_check = checkAuth(context);
+      //const user_check = await checkAuth(context);
       //const { userId } = args;
       const { email, password, confirmPassword } = args.input;
 
@@ -525,7 +525,7 @@ module.exports = {
 
     //delete user
     async deleteUser(_, { userId }, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
 
       try {
         const users = await User.findById(userId);

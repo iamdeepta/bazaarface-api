@@ -38,7 +38,7 @@ module.exports = {
   Mutation: {
     //create country
     async createCountry(_, { input: { name, code } }, context) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       try {
         if (user_check.isAdmin) {
           if (name.trim() !== "" || code.trim() !== "") {
@@ -70,7 +70,7 @@ module.exports = {
 
     //update country
     async updateCountry(parent, args, context, info) {
-      const user_check = checkAuth(context);
+      const user_check = await checkAuth(context);
       const { id } = args;
       const { name, code } = args.input;
 
@@ -111,7 +111,7 @@ module.exports = {
 
     //delete country
     async deleteCountry(_, { id }, context) {
-      const user = checkAuth(context);
+      const user = await checkAuth(context);
 
       try {
         const country = await Country.findById(id);
