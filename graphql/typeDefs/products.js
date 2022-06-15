@@ -32,6 +32,9 @@ const products = gql`
     postedAtMarket: String
     postedAtAuction: String
     user: User
+    users: [SingleUser]
+    buyers: [SingleBuyer]
+    sellers: [SingleSeller]
     message: String
     success: Boolean
   }
@@ -39,6 +42,14 @@ const products = gql`
   type successInfoProducts {
     message: String
     success: Boolean
+  }
+
+  type SingleUser {
+    firstname: String
+    lastname: String
+    company_name: String
+    city: String
+    country: String
   }
 
   type User {
@@ -55,6 +66,16 @@ const products = gql`
   }
 
   type Buyer {
+    profile_image: String
+  }
+
+  type SingleSeller {
+    profile_image: String
+    description: String
+    total_followers: Int
+  }
+
+  type SingleBuyer {
     profile_image: String
   }
 
@@ -111,8 +132,9 @@ const products = gql`
   }
 
   type Query {
-    getProducts: [Products]
+    getProducts(category_id: ID, country_id: [String]): [Products]
     getProduct(id: ID!): Products
+    getProductsMoreLikeThis(category_id: ID!): [Products]
     getAddToAuctionModal(id: ID!, user_id: ID!): Products
     getProductViewModal(id: ID!, user_id: ID!): Products
   }

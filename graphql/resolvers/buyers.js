@@ -43,7 +43,7 @@ module.exports = {
             country: country.name,
           });
         }
-        console.log(buyers);
+        //console.log(buyers);
         return buyers;
       } catch (err) {
         throw new Error(err);
