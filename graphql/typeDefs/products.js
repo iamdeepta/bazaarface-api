@@ -133,13 +133,17 @@ const products = gql`
   }
 
   type Query {
-    getProducts(category_id: ID, country_id: [String]): [Products]
+    getProducts(category_id: ID, country_id: [String], limit: Int): [Products]
     getProduct(id: ID!): Products
     getProductsMoreLikeThis(category_id: ID!): [Products]
     getAddToAuctionModal(id: ID!, user_id: ID!): Products
     getProductViewModal(id: ID!, user_id: ID!): Products
 
-    getAuctionProducts(category_id: ID, country_id: [String]): [Products]
+    getAuctionProducts(
+      category_id: ID
+      country_id: [String]
+      limit: Int
+    ): [Products]
     getAuctionProductModalView(id: ID!): Products
     getAuctionProductsMoreLikeThis(category_id: ID!): [Products]
   }

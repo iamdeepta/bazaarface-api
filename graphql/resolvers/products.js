@@ -17,7 +17,7 @@ module.exports = {
   Query: {
     //get products with filter
     async getProducts(parent, args, context) {
-      const { category_id, country_id } = args;
+      const { category_id, country_id, limit } = args;
       var updates = {};
 
       if (category_id !== undefined && category_id !== "") {
@@ -66,7 +66,9 @@ module.exports = {
               as: "buyers",
             },
           },
-        ]).sort({ createdAt: -1 });
+        ])
+          .sort({ createdAt: -1 })
+          .limit(limit);
 
         for (var i = 0; i < product.length; i++) {
           products.push({
@@ -227,7 +229,7 @@ module.exports = {
 
     //get auction products with filters
     async getAuctionProducts(parent, args, context) {
-      const { category_id, country_id } = args;
+      const { category_id, country_id, limit } = args;
       var updates = {};
 
       updates.isAuction = true;
@@ -280,7 +282,7 @@ module.exports = {
           },
         ])
           .sort({ createdAt: -1 })
-          .limit(12);
+          .limit(limit);
 
         for (var i = 0; i < product.length; i++) {
           const cat = await Category.findOne({ _id: product[i].category });
