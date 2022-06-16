@@ -11,9 +11,11 @@ const Product = require("../../models/Product");
 const User = require("../../models/User");
 const Seller = require("../../models/Seller");
 const Buyer = require("../../models/Buyer");
+const Category = require("../../models/ProductCategory");
 
 module.exports = {
   Query: {
+    //get products with filter
     async getProducts(parent, args, context) {
       const { category_id, country_id } = args;
       var updates = {};
@@ -78,6 +80,8 @@ module.exports = {
         throw new Error(err);
       }
     },
+
+    //get single product
     async getProduct(_, { id }, context) {
       try {
         const product = await Product.aggregate([
@@ -117,6 +121,7 @@ module.exports = {
       }
     },
 
+    //get more like this products
     async getProductsMoreLikeThis(parent, args, context) {
       try {
         var products = [];
@@ -160,6 +165,7 @@ module.exports = {
       }
     },
 
+    //get add to auction modal data
     async getAddToAuctionModal(parent, { id, user_id }, context) {
       try {
         const product = await Product.findOne({ _id: id });
@@ -181,6 +187,7 @@ module.exports = {
       }
     },
 
+    //get product view modal data
     async getProductViewModal(parent, { id, user_id }, context) {
       try {
         const product = await Product.findOne({ _id: id });
@@ -213,6 +220,181 @@ module.exports = {
         } else {
           throw new Error("Product not found");
         }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //get auction products with filters
+    async getAuctionProducts(parent, args, context) {
+      const { category_id, country_id } = args;
+      var updates = {};
+
+      updates.isAuction = true;
+
+      if (category_id !== undefined && category_id !== "") {
+        updates.category = category_id;
+      }
+
+      if (
+        country_id !== undefined &&
+        country_id !== null &&
+        country_id.length !== 0
+      ) {
+        updates.country = { $in: country_id };
+      }
+      try {
+        var products = [];
+        const product = await Product.aggregate([
+          { $match: updates },
+          {
+            $addFields: {
+              user_id: { $toObjectId: "$user_id" },
+              users_id: { $toString: "$user_id" },
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "user_id",
+              foreignField: "_id",
+              as: "users",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "sellers",
+            },
+          },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
+        ])
+          .sort({ createdAt: -1 })
+          .limit(12);
+
+        for (var i = 0; i < product.length; i++) {
+          const cat = await Category.findOne({ _id: product[i].category });
+          products.push({
+            ...product[i],
+            id: product[i]._id,
+            category: cat.name,
+          });
+        }
+        //console.log(products);
+        return products;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //get auction modal view data
+    async getAuctionProductModalView(_, { id }, context) {
+      try {
+        const product = await Product.aggregate([
+          { $match: { _id: mongoose.Types.ObjectId(id) } },
+          {
+            $addFields: {
+              user_id: { $toObjectId: "$user_id" },
+              users_id: { $toString: "$user_id" },
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "user_id",
+              foreignField: "_id",
+              as: "users",
+            },
+          },
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "sellers",
+            },
+          },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
+        ]);
+
+        if (product) {
+          //console.log(product[0]);
+          return { ...product[0], id: product[0]._id };
+        } else {
+          throw new Error("Product not found");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //get more like this auction products
+    async getAuctionProductsMoreLikeThis(parent, args, context) {
+      try {
+        var products = [];
+        const product = await Product.aggregate([
+          { $match: { category: args.category_id, isAuction: true } },
+          {
+            $addFields: {
+              user_id: { $toObjectId: "$user_id" },
+              users_id: { $toString: "$user_id" },
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "user_id",
+              foreignField: "_id",
+              as: "users",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "sellers",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
+        ]).sort({ createdAt: -1 });
+
+        for (var i = 0; i < product.length; i++) {
+          const cat = await Category.findOne({ _id: product[i].category });
+          products.push({
+            ...product[i],
+            id: product[i]._id,
+            category: cat.name,
+          });
+        }
+        //console.log(products);
+        return products;
       } catch (err) {
         throw new Error(err);
       }

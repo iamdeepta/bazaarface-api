@@ -27,6 +27,7 @@ const productSchema = new Schema(
     isMarketplace: { type: Boolean, default: false },
     duration: { type: String, default: null },
     payment: { type: String, default: null },
+    highest_bid_price: { type: String, default: "0" },
     postedAtMarket: { type: String, default: null },
     postedAtAuction: { type: String, default: null },
     // user: {

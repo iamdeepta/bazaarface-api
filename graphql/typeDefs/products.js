@@ -29,6 +29,7 @@ const products = gql`
     isMarketplace: Boolean
     duration: String
     payment: String
+    highest_bid_price: String
     postedAtMarket: String
     postedAtAuction: String
     user: User
@@ -137,6 +138,10 @@ const products = gql`
     getProductsMoreLikeThis(category_id: ID!): [Products]
     getAddToAuctionModal(id: ID!, user_id: ID!): Products
     getProductViewModal(id: ID!, user_id: ID!): Products
+
+    getAuctionProducts(category_id: ID, country_id: [String]): [Products]
+    getAuctionProductModalView(id: ID!): Products
+    getAuctionProductsMoreLikeThis(category_id: ID!): [Products]
   }
 
   type Mutation {
