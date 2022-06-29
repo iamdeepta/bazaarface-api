@@ -13,6 +13,7 @@ const adTypesResolvers = require("./adTypes");
 const productsResolvers = require("./products");
 const adsResolvers = require("./ads");
 const buyersResolvers = require("./buyers");
+const quotationsResolvers = require("./quotations");
 
 const {
   GraphQLUpload,
@@ -36,6 +37,7 @@ module.exports = {
     ...productsResolvers.Query,
     ...adsResolvers.Query,
     ...buyersResolvers.Query,
+    ...quotationsResolvers.Query,
   },
   Upload: GraphQLUpload,
   Mutation: {
@@ -54,5 +56,6 @@ module.exports = {
     ...productsResolvers.Mutation,
     ...adsResolvers.Mutation,
     ...buyersResolvers.Mutation,
+    ...quotationsResolvers.Mutation,
   },
 };
