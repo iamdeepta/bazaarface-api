@@ -1,4 +1,5 @@
 const { ApolloServer } = require("apollo-server-express");
+const { PubSub } = require("graphql-subscriptions");
 const express = require("express");
 const app = express();
 const gql = require("graphql-tag");
@@ -16,10 +17,11 @@ app.use(cors());
 dotenv.config();
 
 async function startServer() {
+  const pubsub = new PubSub();
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: ({ req }) => ({ req }),
+    context: ({ req }) => ({ req, pubsub }),
   });
 
   await server.start();

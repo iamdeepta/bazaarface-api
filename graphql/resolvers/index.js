@@ -14,6 +14,7 @@ const productsResolvers = require("./products");
 const adsResolvers = require("./ads");
 const buyersResolvers = require("./buyers");
 const quotationsResolvers = require("./quotations");
+const messagesResolvers = require("./messages");
 
 const {
   GraphQLUpload,
@@ -38,6 +39,7 @@ module.exports = {
     ...adsResolvers.Query,
     ...buyersResolvers.Query,
     ...quotationsResolvers.Query,
+    ...messagesResolvers.Query,
   },
   Upload: GraphQLUpload,
   Mutation: {
@@ -57,5 +59,10 @@ module.exports = {
     ...adsResolvers.Mutation,
     ...buyersResolvers.Mutation,
     ...quotationsResolvers.Mutation,
+    ...messagesResolvers.Mutation,
+  },
+
+  Subscription: {
+    ...messagesResolvers.Subscription,
   },
 };
