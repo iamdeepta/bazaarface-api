@@ -13,6 +13,10 @@ const Seller = require("../../models/Seller");
 const Buyer = require("../../models/Buyer");
 const Message = require("../../models/Message");
 
+const { PubSub } = require("graphql-subscriptions");
+
+const pubsub = new PubSub();
+
 module.exports = {
   Query: {
     //get conversations
@@ -240,6 +244,7 @@ module.exports = {
       context
     ) {
       //const user_check = await checkAuth(context);
+
       try {
         //if (user_check.isAdmin) {
         if (
@@ -267,7 +272,7 @@ module.exports = {
             { new: true }
           );
 
-          context.pubsub.publish("NEW_MESSAGE", {
+          pubsub.publish("NEW_MESSAGE", {
             newMessage: {
               ...res._doc,
               id: res._id,
@@ -301,7 +306,7 @@ module.exports = {
 
   Subscription: {
     newMessage: {
-      subscribe: (_, args, { pubsub }) => pubsub.asyncIterator("NEW_MESSAGE"),
+      subscribe: (_, __, context) => pubsub.asyncIterator(["NEW_MESSAGE"]),
     },
   },
 };
