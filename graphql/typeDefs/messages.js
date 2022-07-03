@@ -103,6 +103,7 @@ const messages = gql`
 
   type Subscription {
     newMessage: Messages
+    newConversation: Conversations
   }
 `;
 

@@ -20,6 +20,8 @@ const {
 const checkAuth = require("../../util/check-auth");
 //const { SECRET_KEY } = require("../../config");
 const User = require("../../models/User");
+const Seller = require("../../models/Seller");
+const Buyer = require("../../models/Buyer");
 //const passport = require("passport");
 //const OAuth2Strategy = require("passport-oauth2").Strategy;
 const { OAuth2Client } = require("google-auth-library");
@@ -258,12 +260,41 @@ module.exports = {
         isSeller,
         profile_image,
         cover_image,
+        user_type: isSeller ? "Seller" : "Buyer",
         //createdAt: new Date().toISOString(),
       });
 
       const res = await newUser.save();
 
       const token = generateToken(res);
+
+      if (res) {
+        if (res.isSeller === true) {
+          const seller = new Seller({
+            email: res.email,
+            profile_image: res.profile_image,
+            cover_image: res.cover_image,
+            user_id: res._id,
+            user_type: "Seller",
+          });
+
+          const res_seller = await seller.save();
+        }
+
+        if (res.isBuyer === true) {
+          const buyer = new Buyer({
+            email: res.email,
+            profile_image: res.profile_image,
+            cover_image: res.cover_image,
+            user_id: res._id,
+            user_type: "Buyer",
+          });
+
+          const res_buyer = await buyer.save();
+        }
+      } else {
+        throw new Error("Something went wrong. Please try again.");
+      }
 
       return {
         ...res._doc,
@@ -273,7 +304,24 @@ module.exports = {
     },
 
     //google login/signup
-    async googleAuth(parent, { input: { idToken } }, context, info) {
+    async googleAuth(
+      parent,
+      {
+        input: {
+          idToken,
+          user_type,
+          isBuyer,
+          isSeller,
+          country,
+          country_code,
+          city,
+          phone,
+          company_website,
+        },
+      },
+      context,
+      info
+    ) {
       const client_id = process.env.GOOGLE_CLIENT_ID;
       const { payload } = await client.verifyIdToken({
         idToken: idToken,
@@ -300,14 +348,47 @@ module.exports = {
             otp: "google_auth",
             token: idToken,
             password: password,
-            country_code: "N/A",
-            country: "N/A",
-            city: "N/A",
-            phone: "N/A",
-            company_name: "N/A",
-            company_website: "N/A",
+            country_code: country_code,
+            country: country,
+            city: city,
+            phone: phone,
+            isBuyer,
+            isSeller,
+            user_type: isSeller ? "Seller" : "Buyer",
+            company_name:
+              payload.name.split(" ")[0] + " " + payload.name.split(" ")[1],
+            company_website,
           });
-          await newUser.save();
+          const res = await newUser.save();
+
+          if (res) {
+            if (res.isSeller === true) {
+              const seller = new Seller({
+                email: res.email,
+                profile_image: res.profile_image,
+                cover_image: res.cover_image,
+                user_id: res._id,
+                user_type: "Seller",
+              });
+
+              const res_seller = await seller.save();
+            }
+
+            if (res.isBuyer === true) {
+              const buyer = new Buyer({
+                email: res.email,
+                profile_image: res.profile_image,
+                cover_image: res.cover_image,
+                user_id: res._id,
+                user_type: "Buyer",
+              });
+
+              const res_buyer = await buyer.save();
+            }
+          } else {
+            throw new Error("Something went wrong. Please try again.");
+          }
+
           return {
             message: "Login successful",
             success: true,

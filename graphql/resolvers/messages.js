@@ -198,36 +198,56 @@ module.exports = {
       context
     ) {
       //const user_check = await checkAuth(context);
+      const existing_convo = await Conversation.find({
+        sender_id: { $in: [sender_id, receiver_id] },
+        receiver_id: { $in: [sender_id, receiver_id] },
+        sender_user_type,
+        receiver_user_type,
+      });
+      //console.log(existing_convo.length);
       try {
         //if (user_check.isAdmin) {
-        if (
-          sender_id.trim() !== "" &&
-          receiver_id.trim() !== "" &&
-          sender_user_type.trim() !== "" &&
-          receiver_user_type.trim() !== ""
-        ) {
-          const conversation = new Conversation({
-            sender_id,
-            receiver_id,
-            sender_user_type,
-            receiver_user_type,
-          });
+        if (existing_convo.length <= 0) {
+          if (
+            sender_id.trim() !== "" &&
+            receiver_id.trim() !== "" &&
+            sender_user_type.trim() !== "" &&
+            receiver_user_type.trim() !== ""
+          ) {
+            const conversation = new Conversation({
+              sender_id,
+              receiver_id,
+              sender_user_type,
+              receiver_user_type,
+            });
 
-          const res = await conversation.save();
+            const res = await conversation.save();
 
-          return {
-            ...res._doc,
-            id: res._id,
-            message: "Conversation is created.",
-            success: true,
-          };
+            pubsub.publish("NEW_CONVERSATION", {
+              newConversation: {
+                ...res._doc,
+                id: res._id,
+                message: "Conversation is created.",
+                success: true,
+              },
+            });
+
+            return {
+              ...res._doc,
+              id: res._id,
+              message: "Conversation is created.",
+              success: true,
+            };
+          } else {
+            return {
+              ...res._doc,
+              id: res._id,
+              message: "Please fill up all the fields.",
+              success: false,
+            };
+          }
         } else {
-          return {
-            ...res._doc,
-            id: res._id,
-            message: "Please fill up all the fields.",
-            success: false,
-          };
+          throw new Error("Conversation already exists");
         }
         // } else {
         //   throw new AuthenticationError("Action not allowed");
@@ -307,6 +327,9 @@ module.exports = {
   Subscription: {
     newMessage: {
       subscribe: (_, __, context) => pubsub.asyncIterator(["NEW_MESSAGE"]),
+    },
+    newConversation: {
+      subscribe: (_, __, context) => pubsub.asyncIterator(["NEW_CONVERSATION"]),
     },
   },
 };

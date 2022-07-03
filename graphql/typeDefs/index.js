@@ -14,6 +14,7 @@ const ad = require("./ads");
 const buyer = require("./buyers");
 const quotation = require("./quotations");
 const message = require("./messages");
+const bid = require("./bids");
 
 const schemaArray = [
   user,
@@ -32,6 +33,7 @@ const schemaArray = [
   buyer,
   quotation,
   message,
+  bid,
 ];
 
 module.exports = schemaArray;

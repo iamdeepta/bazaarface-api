@@ -96,6 +96,14 @@ const user = gql`
 
   input authInput {
     idToken: String
+    user_type: String
+    isBuyer: Boolean
+    isSeller: Boolean
+    country: String
+    country_code: String
+    city: String
+    phone: String
+    company_website: String
   }
 
   type Query {
