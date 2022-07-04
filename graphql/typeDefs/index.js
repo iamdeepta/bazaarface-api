@@ -15,6 +15,7 @@ const buyer = require("./buyers");
 const quotation = require("./quotations");
 const message = require("./messages");
 const bid = require("./bids");
+const notification = require("./notifications");
 
 const schemaArray = [
   user,
@@ -34,6 +35,7 @@ const schemaArray = [
   quotation,
   message,
   bid,
+  notification,
 ];
 
 module.exports = schemaArray;

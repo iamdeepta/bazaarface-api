@@ -9,6 +9,7 @@ const checkAuth = require("../../util/check-auth");
 const Seller = require("../../models/Seller");
 const Buyer = require("../../models/Buyer");
 const User = require("../../models/User");
+const Notifications = require("../../models/Notification");
 
 module.exports = {
   Query: {
@@ -24,9 +25,22 @@ module.exports = {
       }
     },
     async getSeller(_, { id }, context) {
+      const user_check = await checkAuth(context);
       try {
         const seller = await Seller.findOne({ user_id: id });
         if (seller) {
+          if (user_check.id !== id) {
+            const notification = new Notifications({
+              type: "visited",
+              visitor_id: user_check.id,
+              user_id: seller.user_id,
+              visitor_user_type: user_check.user_type,
+              user_type: "Seller",
+              text: "Someone visited your profile",
+            });
+
+            const res_noti = await notification.save();
+          }
           return seller;
         } else {
           throw new Error("Seller not found");

@@ -12,6 +12,7 @@ const User = require("../../models/User");
 const Seller = require("../../models/Seller");
 const Buyer = require("../../models/Buyer");
 const Category = require("../../models/ProductCategory");
+const Notifications = require("../../models/Notification");
 
 module.exports = {
   Query: {
@@ -604,6 +605,52 @@ module.exports = {
               { new: true }
             );
 
+            //send noti
+            if (product) {
+              const user_followers = await Seller.find({ user_id: user_id });
+
+              for (var i = 0; i < user_followers[0].followers.length; i++) {
+                const buyer = await Buyer.findById(
+                  user_followers[0].followers[i]
+                );
+                //console.log(buyer);
+                const seller = await Seller.findById(
+                  user_followers[0].followers[i]
+                );
+                //console.log(seller);
+
+                var notification;
+
+                if (seller) {
+                  product_id = product._id.toString();
+                  notification = new Notifications({
+                    type: "uploaded_to_auction",
+                    visitor_id: product.user_id,
+                    user_id: seller.user_id,
+                    visitor_user_type: product.user_type,
+                    user_type: "Seller",
+                    product_id: product_id,
+                    text: "Someone uploaded a product to auction.",
+                  });
+                  const res_noti = await notification.save();
+                }
+
+                if (buyer) {
+                  product_id = product._id.toString();
+                  notification = new Notifications({
+                    type: "uploaded_to_auction",
+                    visitor_id: product.user_id,
+                    user_id: buyer.user_id,
+                    visitor_user_type: product.user_type,
+                    user_type: "Buyer",
+                    product_id: product_id,
+                    text: "Someone uploaded a product to auction.",
+                  });
+                  const res_noti = await notification.save();
+                }
+              }
+            }
+
             return {
               ...product._doc,
               message: "Product is added to auction.",
@@ -667,6 +714,52 @@ module.exports = {
               },
               { new: true }
             );
+
+            //send noti
+            if (product) {
+              const user_followers = await Seller.find({ user_id: user_id });
+
+              for (var i = 0; i < user_followers[0].followers.length; i++) {
+                const buyer = await Buyer.findById(
+                  user_followers[0].followers[i]
+                );
+                //console.log(buyer);
+                const seller = await Seller.findById(
+                  user_followers[0].followers[i]
+                );
+                //console.log(seller);
+
+                var notification;
+
+                if (seller) {
+                  product_id = product._id.toString();
+                  notification = new Notifications({
+                    type: "uploaded_to_marketplace",
+                    visitor_id: product.user_id,
+                    user_id: seller.user_id,
+                    visitor_user_type: product.user_type,
+                    user_type: "Seller",
+                    product_id: product_id,
+                    text: "Someone uploaded a product to marketplace.",
+                  });
+                  const res_noti = await notification.save();
+                }
+
+                if (buyer) {
+                  product_id = product._id.toString();
+                  notification = new Notifications({
+                    type: "uploaded_to_marketplace",
+                    visitor_id: product.user_id,
+                    user_id: buyer.user_id,
+                    visitor_user_type: product.user_type,
+                    user_type: "Buyer",
+                    product_id: product_id,
+                    text: "Someone uploaded a product to marketplace.",
+                  });
+                  const res_noti = await notification.save();
+                }
+              }
+            }
 
             return {
               ...product._doc,

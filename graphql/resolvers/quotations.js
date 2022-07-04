@@ -13,6 +13,7 @@ const Seller = require("../../models/Seller");
 const Buyer = require("../../models/Buyer");
 const Category = require("../../models/ProductCategory");
 const Quotation = require("../../models/Quotation");
+const Notifications = require("../../models/Notification");
 
 module.exports = {
   Query: {
@@ -289,6 +290,26 @@ module.exports = {
 
           const res = await quotation.save();
 
+          //send noti
+
+          if (res) {
+            res_id = res._id.toString();
+            const notification = new Notifications({
+              type: "received_quotation",
+              visitor_id: sender_id,
+              user_id: receiver_id,
+              visitor_user_type: sender_user_type,
+              user_type: receiver_user_type,
+              product_id,
+              quotation_id: res_id,
+              text: "Someone sent you a quotation",
+            });
+
+            const res_noti = await notification.save();
+
+            // console.log(res_id);
+          }
+
           return {
             ...res._doc,
             id: res._id,
@@ -314,8 +335,9 @@ module.exports = {
     //accept quotation
     async acceptQuotation(parent, args, context, info) {
       //const user_check = await checkAuth(context);
+
       const { id } = args;
-      const { status } = args.input;
+      //const { status } = args.input;
 
       // TODO: Make sure user doesnt already exist
       try {
@@ -327,6 +349,28 @@ module.exports = {
           },
           { new: true }
         );
+
+        //send noti
+        // const quotation_query = await Quotation.findById(id);
+
+        //console.log(quotation);
+
+        if (quotation) {
+          res_id = quotation._id.toString();
+          const notification = new Notifications({
+            type: "accepted_quotation",
+            visitor_id: quotation.sender_id,
+            user_id: quotation.receiver_id,
+            visitor_user_type: quotation.sender_user_type,
+            user_type: quotation.receiver_user_type,
+            product_id: quotation.product_id,
+            quotation_id: res_id,
+            text: "Someone accepted your quotation",
+          });
+
+          const res_noti = await notification.save();
+        }
+
         return {
           ...quotation._doc,
           message: "Quotation is accepted.",
@@ -345,7 +389,7 @@ module.exports = {
     async rejectQuotation(parent, args, context, info) {
       //const user_check = await checkAuth(context);
       const { id } = args;
-      const { status } = args.input;
+      //const { status } = args.input;
 
       // TODO: Make sure user doesnt already exist
       try {
@@ -357,6 +401,22 @@ module.exports = {
           },
           { new: true }
         );
+
+        if (quotation) {
+          res_id = quotation._id.toString();
+          const notification = new Notifications({
+            type: "rejected_quotation",
+            visitor_id: quotation.sender_id,
+            user_id: quotation.receiver_id,
+            visitor_user_type: quotation.sender_user_type,
+            user_type: quotation.receiver_user_type,
+            product_id: quotation.product_id,
+            quotation_id: res_id,
+            text: "Someone rejected your quotation",
+          });
+
+          const res_noti = await notification.save();
+        }
         return {
           ...quotation._doc,
           message: "Quotation is rejected.",

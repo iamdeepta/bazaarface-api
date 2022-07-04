@@ -83,8 +83,8 @@ const quotations = gql`
 
   type Mutation {
     createQuotation(input: QuotationInput): Quotations
-    acceptQuotation(id: ID!, input: QuotationUpdateInput): Quotations
-    rejectQuotation(id: ID!, input: QuotationUpdateInput): Quotations
+    acceptQuotation(id: ID!): Quotations
+    rejectQuotation(id: ID!): Quotations
   }
 `;
 

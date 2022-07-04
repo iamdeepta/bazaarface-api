@@ -16,6 +16,7 @@ const Bid = require("../../models/Bid");
 const Message = require("../../models/Message");
 const Conversation = require("../../models/Conversation");
 const Size = require("../../models/Size");
+const Notifications = require("../../models/Notification");
 
 const { PubSub } = require("graphql-subscriptions");
 
@@ -262,6 +263,23 @@ module.exports = {
           }
 
           const res = await bid.save();
+
+          //send noti
+          if (res) {
+            res_id = res._id.toString();
+            const notification = new Notifications({
+              type: "placed_bid",
+              visitor_id: sender_id,
+              user_id: receiver_id,
+              visitor_user_type: sender_user_type,
+              user_type: receiver_user_type,
+              product_id: product_id,
+              bid_id: res_id,
+              text: "Someone placed a bid",
+            });
+
+            const res_noti = await notification.save();
+          }
 
           pubsub.publish("NEW_BID", {
             newBid: {

@@ -10,6 +10,7 @@ const Buyer = require("../../models/Buyer");
 const Seller = require("../../models/Seller");
 const User = require("../../models/User");
 const Country = require("../../models/Country");
+const Notifications = require("../../models/Notification");
 const { update } = require("../../models/User");
 
 module.exports = {
@@ -50,6 +51,7 @@ module.exports = {
       }
     },
     async getBuyer(_, { id }, context) {
+      const user_check = await checkAuth(context);
       try {
         const buyer = await Buyer.aggregate([
           { $match: { user_id: id } },
@@ -72,6 +74,18 @@ module.exports = {
           _id: buyer[0].users[0].country,
         });
         if (buyer) {
+          if (user_check.id !== id) {
+            const notification = new Notifications({
+              type: "visited",
+              visitor_id: user_check.id,
+              user_id: buyer[0].user_id,
+              visitor_user_type: user_check.user_type,
+              user_type: "Buyer",
+              text: "Someone visited your profile",
+            });
+
+            const res_noti = await notification.save();
+          }
           return { ...buyer[0], id: buyer[0]._id, country: country.name };
         } else {
           throw new Error("Buyer not found");
