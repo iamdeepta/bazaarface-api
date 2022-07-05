@@ -120,6 +120,9 @@ module.exports = {
           if (notification[i].type === "uploaded_to_auction") {
             text = `${notification[i].users[0].company_name} uploaded a new product to auction`;
           }
+          if (notification[i].type === "ending_seller_auction") {
+            text = `Your product ${notification[i].products[0].name} in auction is about to end in 12 hours`;
+          }
           notifications.push({
             ...notification[i],
             id: notification[i]._id,

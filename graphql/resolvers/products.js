@@ -230,6 +230,7 @@ module.exports = {
 
     //get auction products with filters
     async getAuctionProducts(parent, args, context) {
+      const check_user = await checkAuth(context);
       const { category_id, country_id, limit } = args;
       var updates = {};
 
@@ -285,7 +286,69 @@ module.exports = {
           .sort({ createdAt: -1 })
           .limit(limit);
 
+        var text = "";
         for (var i = 0; i < product.length; i++) {
+          //send noti
+          const remaining_auction_day =
+            (new Date().getTime() -
+              new Date(product[i].postedAtAuction).getTime()) /
+            (1000 * 3600 * 24);
+
+          if (product[i].isNotified === false) {
+            if (product[i].duration > 0) {
+              // console.log(product[i].duration - remaining_auction_day);
+              if (
+                product[i].duration - remaining_auction_day <= 0.5 &&
+                product[i].duration - remaining_auction_day > 0
+              ) {
+                const product_id = product[i]._id.toString();
+                const notification = new Notifications({
+                  type: "ending_seller_auction",
+                  visitor_id: product[i].user_id,
+                  user_id: check_user.id,
+                  visitor_user_type: product[i].user_type,
+                  user_type: product[i].user_type,
+                  product_id: product_id,
+                  text: "This product in auction is about to end in 12 hours",
+                });
+
+                const res_noti = await notification.save();
+
+                if (res_noti) {
+                  const update_isNotified = await Product.findByIdAndUpdate(
+                    product[i]._id,
+                    {
+                      $set: { isNotified: true },
+                    },
+                    { new: true }
+                  );
+                }
+              }
+            }
+            // else {
+            //   const update_isAuction = await Product.findByIdAndUpdate(
+            //     product[i]._id,
+            //     {
+            //       $set: { isAuction: false },
+            //     },
+            //     { new: true }
+            //   );
+            // }
+          }
+
+          //set isAuction to false if auction duration is over
+          if (product[i].isAuction === true) {
+            if (product[i].duration - remaining_auction_day <= 0.0) {
+              const update_isAuction = await Product.findByIdAndUpdate(
+                product[i]._id,
+                {
+                  $set: { isAuction: false },
+                },
+                { new: true }
+              );
+            }
+          }
+
           const cat = await Category.findOne({ _id: product[i].category });
           products.push({
             ...product[i],
@@ -575,7 +638,7 @@ module.exports = {
         auction_quantity.trim() !== "" &&
         price.trim() !== "" &&
         // total_auction_price.trim() !== "" &&
-        duration.trim() !== "" &&
+        duration !== "" &&
         payment.trim() !== ""
       ) {
         updates.auction_quantity = auction_quantity;
@@ -592,9 +655,13 @@ module.exports = {
         };
       }
 
+      //find if auction date is over
+      //console.log(new Date(updates.postedAtAuction).getTime() - new Date());
+
       // TODO: Make sure user doesnt already exist
       try {
         const auction = await Product.findOne({ _id: id, isAuction: true });
+
         if (!auction) {
           if (user_check.id === user_id) {
             const product = await Product.findByIdAndUpdate(

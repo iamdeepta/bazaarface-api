@@ -17,6 +17,7 @@ const quotationsResolvers = require("./quotations");
 const messagesResolvers = require("./messages");
 const bidsResolvers = require("./bids");
 const notificationsResolvers = require("./notifications");
+const postsResolvers = require("./posts");
 
 const {
   GraphQLUpload,
@@ -44,6 +45,7 @@ module.exports = {
     ...messagesResolvers.Query,
     ...bidsResolvers.Query,
     ...notificationsResolvers.Query,
+    ...postsResolvers.Query,
   },
   Upload: GraphQLUpload,
   Mutation: {
@@ -66,6 +68,7 @@ module.exports = {
     ...messagesResolvers.Mutation,
     ...bidsResolvers.Mutation,
     ...notificationsResolvers.Mutation,
+    ...postsResolvers.Mutation,
   },
 
   Subscription: {

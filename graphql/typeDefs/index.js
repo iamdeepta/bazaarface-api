@@ -16,6 +16,7 @@ const quotation = require("./quotations");
 const message = require("./messages");
 const bid = require("./bids");
 const notification = require("./notifications");
+const post = require("./posts");
 
 const schemaArray = [
   user,
@@ -36,6 +37,7 @@ const schemaArray = [
   message,
   bid,
   notification,
+  post,
 ];
 
 module.exports = schemaArray;

@@ -25,11 +25,12 @@ const productSchema = new Schema(
     image: { type: Array, default: [] },
     isAuction: { type: Boolean, default: false },
     isMarketplace: { type: Boolean, default: false },
-    duration: { type: String, default: null },
+    duration: { type: Number, default: 0 },
     payment: { type: String, default: null },
     highest_bid_price: { type: String, default: "0" },
     postedAtMarket: { type: String, default: null },
     postedAtAuction: { type: String, default: null },
+    isNotified: { type: Boolean, default: false },
     // user: {
     //   type: Schema.Types.ObjectId,
     //   ref: "users",

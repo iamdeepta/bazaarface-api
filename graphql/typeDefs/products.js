@@ -27,7 +27,7 @@ const products = gql`
     image: [String]
     isAuction: Boolean
     isMarketplace: Boolean
-    duration: String
+    duration: Int
     payment: String
     highest_bid_price: String
     postedAtMarket: String
@@ -121,7 +121,7 @@ const products = gql`
     auction_quantity: String
     price: String
     total_auction_price: String
-    duration: String
+    duration: Int
     payment: String
   }
 
