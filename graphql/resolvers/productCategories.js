@@ -49,7 +49,7 @@ module.exports = {
         if (user.isAdmin) {
           for (var i = 0; i < total.length; i++) {
             const prod = await Product.find({ category: total[i]._id });
-            console.log(prod.length);
+            //console.log(prod.length);
             total_count.push({
               ...prod,
               id: total[i]._id,
