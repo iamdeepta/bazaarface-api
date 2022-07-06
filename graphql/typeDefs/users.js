@@ -109,6 +109,7 @@ const user = gql`
   type Query {
     getUsers: [User]
     getUser(userId: ID!): User
+    getTotalUser: Int
   }
   type Mutation {
     register(registerInput: RegisterInput): User!

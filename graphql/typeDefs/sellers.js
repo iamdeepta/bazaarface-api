@@ -79,6 +79,7 @@ const sellers = gql`
     getSellerServices: [Services]
     getSellerService(id: ID!): Services
     getSellerFollowersList(id: ID!): [SellersFollowersList]
+    getTotalSeller: Int
   }
 
   type Mutation {

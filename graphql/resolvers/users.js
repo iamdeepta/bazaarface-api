@@ -155,6 +155,21 @@ module.exports = {
         throw new Error(err);
       }
     },
+
+    //get total users
+    async getTotalUser(parent, data, context) {
+      const user = await checkAuth(context);
+      try {
+        const users = await User.find();
+        if (user.isAdmin) {
+          return users.length;
+        } else {
+          throw new AuthenticationError("Action not allowed");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
   },
   // Upload: GraphQLUpload,
   Mutation: {

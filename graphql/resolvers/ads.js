@@ -214,6 +214,21 @@ module.exports = {
         throw new Error(err);
       }
     },
+
+    //get total ads
+    async getTotalAd(parent, data, context) {
+      const user = await checkAuth(context);
+      try {
+        const ads = await Ad.find();
+        if (user.isAdmin) {
+          return ads.length;
+        } else {
+          throw new AuthenticationError("Action not allowed");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
   },
   // Upload: GraphQLUpload,
 

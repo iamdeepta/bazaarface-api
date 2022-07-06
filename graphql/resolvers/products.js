@@ -465,6 +465,36 @@ module.exports = {
         throw new Error(err);
       }
     },
+
+    //get total products
+    async getTotalProduct(parent, data, context) {
+      const user = await checkAuth(context);
+      try {
+        const products = await Product.find();
+        if (user.isAdmin) {
+          return products.length;
+        } else {
+          throw new AuthenticationError("Action not allowed");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //get total auction product
+    async getTotalAuctionProduct(parent, data, context) {
+      const user = await checkAuth(context);
+      try {
+        const auction = await Product.find({ isAuction: true });
+        if (user.isAdmin) {
+          return auction.length;
+        } else {
+          throw new AuthenticationError("Action not allowed");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
   },
 
   // Upload: GraphQLUpload,

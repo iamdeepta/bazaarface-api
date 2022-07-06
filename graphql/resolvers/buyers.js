@@ -143,6 +143,21 @@ module.exports = {
         throw new Error(err);
       }
     },
+
+    //get total buyers
+    async getTotalBuyer(parent, data, context) {
+      const user = await checkAuth(context);
+      try {
+        const buyers = await Buyer.find();
+        if (user.isAdmin) {
+          return buyers.length;
+        } else {
+          throw new AuthenticationError("Action not allowed");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
   },
   // Upload: GraphQLUpload,
 

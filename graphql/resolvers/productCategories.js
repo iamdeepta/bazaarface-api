@@ -1,4 +1,8 @@
-const { UserInputError, AuthenticationError } = require("apollo-server");
+const {
+  UserInputError,
+  AuthenticationError,
+  toApolloError,
+} = require("apollo-server");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -6,6 +10,7 @@ dotenv.config();
 const checkAuth = require("../../util/check-auth");
 
 const ProductCategory = require("../../models/ProductCategory");
+const Product = require("../../models/Product");
 
 const CategoryImageResolver = require("./category_image_resolvers");
 
@@ -29,6 +34,33 @@ module.exports = {
           return category;
         } else {
           throw new Error("Product Category not found");
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //get product categories with total product count
+    async getProductCategoriesWithTotalProductCount(parent, data, context) {
+      const user = await checkAuth(context);
+      var total_count = [];
+      try {
+        const total = await ProductCategory.find().sort({ createdAt: -1 });
+        if (user.isAdmin) {
+          for (var i = 0; i < total.length; i++) {
+            const prod = await Product.find({ category: total[i]._id });
+            console.log(prod.length);
+            total_count.push({
+              ...prod,
+              id: total[i]._id,
+              name: total[i].name,
+              total: prod.length,
+            });
+            // return { id: total._id, name: total.name, total: prod.length };
+          }
+          return total_count;
+        } else {
+          throw new AuthenticationError("Action not allowed");
         }
       } catch (err) {
         throw new Error(err);

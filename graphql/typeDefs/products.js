@@ -146,6 +146,9 @@ const products = gql`
     ): [Products]
     getAuctionProductModalView(id: ID!): Products
     getAuctionProductsMoreLikeThis(category_id: ID!): [Products]
+
+    getTotalProduct: Int
+    getTotalAuctionProduct: Int
   }
 
   type Mutation {

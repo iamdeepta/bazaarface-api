@@ -9,6 +9,7 @@ const postSchema = new Schema(
     text: { type: String, default: null },
     image: { type: Array, default: [] },
     likes: { type: Array, default: [] },
+    // comments: { type: Array, default: [] },
   },
   { timestamps: true }
 );

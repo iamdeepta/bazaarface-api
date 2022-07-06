@@ -154,6 +154,14 @@ module.exports = {
               as: "sellers",
             },
           },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
         ]);
 
         if (post) {

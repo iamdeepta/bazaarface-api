@@ -70,6 +70,7 @@ const buyers = gql`
     getBuyer(id: ID!): Buyers
     getWorkHistory(id: ID!, work_history_id: String): WorkHistory
     getBuyerFollowersList(id: ID!): [BuyersFollowersList]
+    getTotalBuyer: Int
   }
 
   type Mutation {

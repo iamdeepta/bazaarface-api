@@ -11,6 +11,12 @@ const productCategories = gql`
     success: Boolean
   }
 
+  type ProductCategoriesWithTotal {
+    id: ID!
+    name: String
+    total: Int
+  }
+
   type successInfoProductCategory {
     message: String
     success: Boolean
@@ -29,6 +35,8 @@ const productCategories = gql`
   type Query {
     getProductCategories: [ProductCategories]
     getProductCategory(id: ID!): ProductCategories
+
+    getProductCategoriesWithTotalProductCount: [ProductCategoriesWithTotal]
   }
 
   type Mutation {

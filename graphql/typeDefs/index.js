@@ -17,6 +17,7 @@ const message = require("./messages");
 const bid = require("./bids");
 const notification = require("./notifications");
 const post = require("./posts");
+const postComment = require("./postComments");
 
 const schemaArray = [
   user,
@@ -38,6 +39,7 @@ const schemaArray = [
   bid,
   notification,
   post,
+  postComment,
 ];
 
 module.exports = schemaArray;

@@ -108,6 +108,8 @@ const ads = gql`
       country: String
       search_text: String
     ): [MoreLikeThisAd]
+
+    getTotalAd: Int
   }
 
   type Mutation {
