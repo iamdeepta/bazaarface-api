@@ -438,6 +438,7 @@ module.exports = {
         company_website,
         country,
         city,
+        user_type,
         profile_image,
         cover_image,
       } = args.updateUserInput;
@@ -467,6 +468,9 @@ module.exports = {
       }
       if (city !== undefined) {
         updates.city = city;
+      }
+      if (user_type !== undefined) {
+        updates.user_type = user_type;
       }
       if (profile_image !== undefined) {
         updates.profile_image = profile_image;
