@@ -18,6 +18,7 @@ const bid = require("./bids");
 const notification = require("./notifications");
 const post = require("./posts");
 const postComment = require("./postComments");
+const onboard = require("./onboards");
 
 const schemaArray = [
   user,
@@ -40,6 +41,7 @@ const schemaArray = [
   notification,
   post,
   postComment,
+  onboard,
 ];
 
 module.exports = schemaArray;
