@@ -84,6 +84,7 @@ const user = gql`
     city: String
     isBuyer: Boolean
     isSeller: Boolean
+    isAdmin: Boolean
     user_type: String
     profile_image: String
     cover_image: String
