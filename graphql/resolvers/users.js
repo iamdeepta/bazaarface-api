@@ -439,6 +439,9 @@ module.exports = {
         country,
         city,
         user_type,
+        isAdmin,
+        isBuyer,
+        isSeller,
         profile_image,
         cover_image,
       } = args.updateUserInput;
@@ -477,6 +480,15 @@ module.exports = {
       }
       if (cover_image !== undefined) {
         updates.cover_image = cover_image;
+      }
+      if (isAdmin !== undefined) {
+        updates.isAdmin = isAdmin;
+      }
+      if (isBuyer !== undefined) {
+        updates.isBuyer = isBuyer;
+      }
+      if (isSeller !== undefined) {
+        updates.isSeller = isSeller;
       }
 
       // Validate user data
