@@ -40,6 +40,7 @@ const ads = gql`
     description: String
     type: String
     ad_for: String
+    phone: String
     image: [String]
     adtypes: [AdTypes]
     users: [User]
