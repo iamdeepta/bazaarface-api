@@ -35,6 +35,7 @@ const ads = gql`
     location: String
     price: String
     quantity: String
+    description: String
     type: String
     ad_for: String
     image: [String]
