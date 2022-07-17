@@ -21,7 +21,7 @@ module.exports = {
   Query: {
     //get conversations
     async getConversations(parent, args, context) {
-      const { receiver_id, receiver_user_type } = args;
+      const { receiver_id, receiver_user_type, search_text } = args;
 
       try {
         var conversations = [];
@@ -91,7 +91,40 @@ module.exports = {
           });
         }
         //console.log(conversations[0].users);
-        return conversations;
+        //search by user name or company name
+
+        if (search_text.trim() !== "") {
+          var convos = [];
+          for (var j = 0; j < conversations.length; j++) {
+            if (
+              conversations[j].sender_user_type === "Buyer" &&
+              conversations[j].sender[0].firstname
+                .trim()
+                .toLowerCase()
+                .includes(search_text.trim().toLowerCase())
+            ) {
+              convos.push({ ...conversations[j] });
+              //console.log(convos);
+              //return convos;
+            } else if (
+              conversations[j].sender_user_type === "Seller" &&
+              conversations[j].sender[0].company_name
+                .trim()
+                .toLowerCase()
+                .includes(search_text.trim().toLowerCase())
+            ) {
+              convos.push({ ...conversations[j] });
+              //console.log(convos);
+              //return convos;
+            }
+          }
+        } else {
+          //console.log(conversations);
+          convos = conversations;
+          //return convos;
+        }
+
+        return convos;
       } catch (err) {
         throw new Error(err);
       }

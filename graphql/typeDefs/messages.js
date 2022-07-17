@@ -85,6 +85,7 @@ const messages = gql`
     getConversations(
       receiver_id: ID
       receiver_user_type: String
+      search_text: String
     ): [Conversations]
     # getConversation(id: ID!): Conversations
     getMessages(conversation_id: ID!): [Messages]
