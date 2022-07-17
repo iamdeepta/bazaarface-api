@@ -32,6 +32,8 @@ const ads = gql`
   type MoreLikeThisAd {
     id: ID
     name: String
+    user_id: String
+    user_type: String
     location: String
     price: String
     quantity: String
