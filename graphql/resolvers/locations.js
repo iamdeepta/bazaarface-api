@@ -7,6 +7,8 @@ const checkAuth = require("../../util/check-auth");
 
 const Location = require("../../models/Location");
 
+const SellerLocationImageResolver = require("./seller_location_image_resolvers");
+
 module.exports = {
   Query: {
     async getSellerLocations(parent, args, context) {
@@ -37,7 +39,7 @@ module.exports = {
 
   Mutation: {
     //create seller location
-    async createSellerLocation(
+    createSellerLocation: (
       _,
       {
         user_id,
@@ -48,49 +50,78 @@ module.exports = {
           open_day2,
           open_time1,
           open_time2,
-          map,
+          file,
+          bucketName,
         },
       },
       context
-    ) {
-      //const user_check = await checkAuth(context);
-      try {
-        //if (user_check.isAdmin) {
-        if (office.trim() !== "" || address.trim() !== "") {
-          const location = new Location({
-            user_id,
-            office,
-            address,
-            open_day1,
-            open_day2,
-            open_time1,
-            open_time2,
-            map,
-          });
+    ) =>
+      new SellerLocationImageResolver().createSellerLocation(
+        user_id,
+        office,
+        address,
+        open_day1,
+        open_day2,
+        open_time1,
+        open_time2,
+        file,
+        bucketName,
+        context
+      ),
+    // async createSellerLocation(
+    //   _,
+    //   {
+    //     user_id,
+    //     input: {
+    //       office,
+    //       address,
+    //       open_day1,
+    //       open_day2,
+    //       open_time1,
+    //       open_time2,
+    //       map,
+    //     },
+    //   },
+    //   context
+    // ) {
+    //   //const user_check = await checkAuth(context);
+    //   try {
+    //     //if (user_check.isAdmin) {
+    //     if (office.trim() !== "" || address.trim() !== "") {
+    //       const location = new Location({
+    //         user_id,
+    //         office,
+    //         address,
+    //         open_day1,
+    //         open_day2,
+    //         open_time1,
+    //         open_time2,
+    //         map,
+    //       });
 
-          const res = await location.save();
+    //       const res = await location.save();
 
-          return {
-            ...res._doc,
-            id: res._id,
-            message: "Location is created successfully.",
-            success: true,
-          };
-        } else {
-          return {
-            ...res._doc,
-            id: res._id,
-            message: "Office and address must not be empty.",
-            success: false,
-          };
-        }
-        // } else {
-        //   throw new AuthenticationError("Action not allowed");
-        // }
-      } catch (err) {
-        throw new UserInputError("Errors occcur while updating");
-      }
-    },
+    //       return {
+    //         ...res._doc,
+    //         id: res._id,
+    //         message: "Location is created successfully.",
+    //         success: true,
+    //       };
+    //     } else {
+    //       return {
+    //         ...res._doc,
+    //         id: res._id,
+    //         message: "Office and address must not be empty.",
+    //         success: false,
+    //       };
+    //     }
+    //     // } else {
+    //     //   throw new AuthenticationError("Action not allowed");
+    //     // }
+    //   } catch (err) {
+    //     throw new UserInputError("Errors occcur while updating");
+    //   }
+    // },
 
     //update seller location
     async updateSellerLocation(parent, args, context, info) {
@@ -103,7 +134,7 @@ module.exports = {
         open_day2,
         open_time1,
         open_time2,
-        map,
+        // map,
       } = args.input;
 
       const updates = {};
@@ -132,9 +163,9 @@ module.exports = {
         updates.open_time2 = open_time2;
       }
 
-      if (map !== undefined) {
-        updates.map = map;
-      }
+      // if (map !== undefined) {
+      //   updates.map = map;
+      // }
 
       // TODO: Make sure user doesnt already exist
       try {
@@ -160,6 +191,15 @@ module.exports = {
         throw new UserInputError("Errors occcur while updating");
       }
     },
+
+    //update seller location image
+    updateSellerLocationImage: (_, { id, file, bucketName }, context) =>
+      new SellerLocationImageResolver().updateSellerLocationImage(
+        id,
+        file,
+        bucketName,
+        context
+      ),
 
     //delete location
     async deleteSellerLocation(_, { id }, context) {

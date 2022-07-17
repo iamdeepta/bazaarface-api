@@ -1,6 +1,7 @@
 const { gql } = require("apollo-server");
 
 const locations = gql`
+  scalar Upload
   type Locations {
     id: ID!
     user_id: String!
@@ -27,7 +28,17 @@ const locations = gql`
     open_day2: String
     open_time1: String
     open_time2: String
-    map: String
+    file: Upload!
+    bucketName: String!
+  }
+
+  input SellerLocationUpdateInput {
+    office: String
+    address: String
+    open_day1: String
+    open_day2: String
+    open_time1: String
+    open_time2: String
   }
 
   type Query {
@@ -37,7 +48,12 @@ const locations = gql`
 
   type Mutation {
     createSellerLocation(user_id: ID!, input: SellerLocationInput): Locations!
-    updateSellerLocation(id: ID, input: SellerLocationInput): Locations
+    updateSellerLocation(id: ID, input: SellerLocationUpdateInput): Locations
+    updateSellerLocationImage(
+      id: ID!
+      file: Upload!
+      bucketName: String!
+    ): Locations
     deleteSellerLocation(id: ID!): successInfoSellerLocation
   }
 `;

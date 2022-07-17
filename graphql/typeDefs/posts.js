@@ -29,8 +29,10 @@ const posts = gql`
   }
 
   type Like {
-    user_id: String
-    user_type: String
+    # user_id: String
+    # user_type: String
+    like_name: String
+    like_image: String
   }
 
   type SingleUser {

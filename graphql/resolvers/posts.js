@@ -114,13 +114,37 @@ module.exports = {
         ]).sort({ createdAt: -1 });
 
         for (var i = 0; i < post.length; i++) {
+          //get users name and pic who like the post
+          var likes = [];
+          for (var j = 0; j < post[i].likes.length; j++) {
+            const user = await User.findById(post[i].likes[j].user_id);
+            if (post[i].likes[j].user_type === "Seller") {
+              const seller = await Seller.find({
+                user_id: post[i].likes[j].user_id,
+              });
+              likes.push({
+                like_name: user.company_name,
+                like_image: seller[0].profile_image,
+              });
+            } else {
+              const buyer = await Buyer.find({
+                user_id: post[i].likes[j].user_id,
+              });
+              likes.push({
+                like_name: user.firstname + " " + user.lastname,
+                like_image: buyer[0].profile_image,
+              });
+            }
+          }
+          //console.log(likes);
           posts.push({
             ...post[i],
             id: post[i]._id,
             totalLikes: post[i].likes.length,
+            likes: likes,
           });
         }
-        //console.log(products);
+        //console.log(posts);
         return posts;
       } catch (err) {
         throw new Error(err);
