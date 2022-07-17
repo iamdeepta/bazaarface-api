@@ -30,6 +30,7 @@ const ads = gql`
   }
 
   type MoreLikeThisAd {
+    id: ID
     name: String
     location: String
     price: String
@@ -38,6 +39,9 @@ const ads = gql`
     ad_for: String
     image: [String]
     adtypes: [AdTypes]
+    users: [User]
+    sellers: [Seller]
+    buyers: [Buyer]
   }
 
   type AdTypes {
@@ -107,6 +111,7 @@ const ads = gql`
       type: String
       country: String
       search_text: String
+      limit: Int
     ): [MoreLikeThisAd]
 
     getTotalAd: Int

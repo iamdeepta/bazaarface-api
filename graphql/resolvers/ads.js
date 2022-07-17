@@ -72,6 +72,7 @@ module.exports = {
           if (buyer === undefined) {
             return {
               ...ad._doc,
+              id: ad._id,
               country: country.name,
               user: {
                 firstname: user.firstname,
@@ -87,6 +88,7 @@ module.exports = {
           } else if (seller === undefined) {
             return {
               ...ad._doc,
+              id: ad._id,
               user: {
                 firstname: user.firstname,
                 lastname: user.lastname,
@@ -139,7 +141,16 @@ module.exports = {
     //filter ad
     async getAdFilter(
       _,
-      { category_id, ad_for, sort_by, user_type, type, country, search_text },
+      {
+        category_id,
+        ad_for,
+        sort_by,
+        user_type,
+        type,
+        country,
+        search_text,
+        limit,
+      },
       context
     ) {
       var updates = {};
@@ -177,10 +188,17 @@ module.exports = {
 
       try {
         var ad;
+        var ads = [];
         if (search_text !== undefined && search_text !== "") {
           ad = await Ad.aggregate([
             { $match: { $text: { $search: search_text } } },
-            { $addFields: { type: { $toObjectId: "$type" } } },
+            {
+              $addFields: {
+                type: { $toObjectId: "$type" },
+                user_id: { $toObjectId: "$user_id" },
+                users_id: { $toString: "$user_id" },
+              },
+            },
             {
               $lookup: {
                 from: "adtypes",
@@ -189,11 +207,43 @@ module.exports = {
                 as: "adtypes",
               },
             },
-          ]).sort(sorts);
+            {
+              $lookup: {
+                from: "users",
+                localField: "user_id",
+                foreignField: "_id",
+                as: "users",
+              },
+            },
+            {
+              $lookup: {
+                from: "sellers",
+                localField: "users_id",
+                foreignField: "user_id",
+                as: "sellers",
+              },
+            },
+            {
+              $lookup: {
+                from: "buyers",
+                localField: "users_id",
+                foreignField: "user_id",
+                as: "buyers",
+              },
+            },
+          ])
+            .sort(sorts)
+            .limit(limit);
         } else {
           ad = await Ad.aggregate([
             { $match: updates },
-            { $addFields: { type: { $toObjectId: "$type" } } },
+            {
+              $addFields: {
+                type: { $toObjectId: "$type" },
+                user_id: { $toObjectId: "$user_id" },
+                users_id: { $toString: "$user_id" },
+              },
+            },
             {
               $lookup: {
                 from: "adtypes",
@@ -202,11 +252,40 @@ module.exports = {
                 as: "adtypes",
               },
             },
-          ]).sort(sorts);
+            {
+              $lookup: {
+                from: "users",
+                localField: "user_id",
+                foreignField: "_id",
+                as: "users",
+              },
+            },
+            {
+              $lookup: {
+                from: "sellers",
+                localField: "users_id",
+                foreignField: "user_id",
+                as: "sellers",
+              },
+            },
+            {
+              $lookup: {
+                from: "buyers",
+                localField: "users_id",
+                foreignField: "user_id",
+                as: "buyers",
+              },
+            },
+          ])
+            .sort(sorts)
+            .limit(limit);
         }
 
         if (ad) {
-          return ad;
+          for (var i = 0; i < ad.length; i++) {
+            ads.push({ ...ad[i], id: ad[i]._id });
+          }
+          return ads;
         } else {
           throw new Error("Ad not found");
         }
