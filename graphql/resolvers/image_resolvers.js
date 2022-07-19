@@ -3,6 +3,8 @@ const { promisify } = require("util");
 const { extname } = require("path");
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const User = require("../../models/User");
+const Seller = require("../../models/Seller");
+const Buyer = require("../../models/Buyer");
 
 const sharp = require("sharp");
 const { finished } = require("stream");
@@ -77,6 +79,26 @@ class ImageResolver {
             },
             { new: true }
           );
+
+          if (pro_pic) {
+            const seller_user_id = pro_pic._id.toString();
+            const pro_pic_seller = await Seller.findOneAndUpdate(
+              { user_id: seller_user_id },
+              {
+                $set: { profile_image: params.Key },
+              },
+              { new: true }
+            );
+
+            const buyer_user_id = pro_pic._id.toString();
+            const pro_pic_buyer = await Buyer.findOneAndUpdate(
+              { user_id: buyer_user_id },
+              {
+                $set: { profile_image: params.Key },
+              },
+              { new: true }
+            );
+          }
 
           require("fs").unlinkSync(web_file_name);
 
@@ -172,6 +194,26 @@ class ImageResolver {
             },
             { new: true }
           );
+
+          if (pro_pic) {
+            const sellers_user_id = pro_pic._id.toString();
+            const pro_pic_seller = await Seller.findOneAndUpdate(
+              { user_id: sellers_user_id },
+              {
+                $set: { cover_image: params.Key },
+              },
+              { new: true }
+            );
+
+            const buyers_user_id = pro_pic._id.toString();
+            const pro_pic_buyer = await Buyer.findOneAndUpdate(
+              { user_id: buyers_user_id },
+              {
+                $set: { cover_image: params.Key },
+              },
+              { new: true }
+            );
+          }
 
           require("fs").unlinkSync(web_file_name);
 
