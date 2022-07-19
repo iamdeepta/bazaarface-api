@@ -14,6 +14,7 @@ const productCategories = gql`
   type ProductCategoriesWithTotal {
     id: ID!
     name: String
+    image: String
     total: Int
   }
 

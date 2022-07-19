@@ -54,6 +54,7 @@ module.exports = {
               ...prod,
               id: total[i]._id,
               name: total[i].name,
+              image: total[i].image,
               total: prod.length,
             });
             // return { id: total._id, name: total.name, total: prod.length };
