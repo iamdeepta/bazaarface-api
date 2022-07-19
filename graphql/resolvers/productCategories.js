@@ -42,27 +42,27 @@ module.exports = {
 
     //get product categories with total product count
     async getProductCategoriesWithTotalProductCount(parent, data, context) {
-      const user = await checkAuth(context);
+      //const user = await checkAuth(context);
       var total_count = [];
       try {
         const total = await ProductCategory.find().sort({ createdAt: -1 });
-        if (user.isAdmin) {
-          for (var i = 0; i < total.length; i++) {
-            const prod = await Product.find({ category: total[i]._id });
-            //console.log(prod.length);
-            total_count.push({
-              ...prod,
-              id: total[i]._id,
-              name: total[i].name,
-              image: total[i].image,
-              total: prod.length,
-            });
-            // return { id: total._id, name: total.name, total: prod.length };
-          }
-          return total_count;
-        } else {
-          throw new AuthenticationError("Action not allowed");
+        //if (user.isAdmin) {
+        for (var i = 0; i < total.length; i++) {
+          const prod = await Product.find({ category: total[i]._id });
+          //console.log(prod.length);
+          total_count.push({
+            ...prod,
+            id: total[i]._id,
+            name: total[i].name,
+            image: total[i].image,
+            total: prod.length,
+          });
+          // return { id: total._id, name: total.name, total: prod.length };
         }
+        return total_count;
+        // } else {
+        //   throw new AuthenticationError("Action not allowed");
+        // }
       } catch (err) {
         throw new Error(err);
       }
