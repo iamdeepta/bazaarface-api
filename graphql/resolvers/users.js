@@ -5,6 +5,7 @@ const aws = require("aws-sdk");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const dotenv = require("dotenv");
+const mongoose = require("mongoose");
 const ImageResolver = require("./image_resolvers");
 //const { GraphQLUpload } = require("graphql-upload");
 
@@ -22,6 +23,7 @@ const checkAuth = require("../../util/check-auth");
 const User = require("../../models/User");
 const Seller = require("../../models/Seller");
 const Buyer = require("../../models/Buyer");
+const Country = require("../../models/Country");
 //const passport = require("passport");
 //const OAuth2Strategy = require("passport-oauth2").Strategy;
 const { OAuth2Client } = require("google-auth-library");
@@ -141,15 +143,42 @@ module.exports = {
       const user_check = await await checkAuth(context);
 
       try {
-        const user = await User.findById(userId);
+        const user = await User.aggregate([
+          { $match: { _id: mongoose.Types.ObjectId(userId) } },
+          {
+            $addFields: {
+              user_id: { $toString: "$_id" },
+            },
+          },
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "user_id",
+              foreignField: "user_id",
+              as: "sellers",
+            },
+          },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "user_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
+        ]);
+
+        const country = await Country.findOne({
+          _id: user[0].country,
+        });
         if (user) {
           if (userId === user_check.id || user_check.isAdmin) {
-            return user;
+            return { ...user[0], id: user[0]._id, country: country.name };
           } else {
             throw new AuthenticationError("Action not allowed");
           }
         } else {
-          throw new Error("User not found");
+          throw new Error("Buyer not found");
         }
       } catch (err) {
         throw new Error(err);

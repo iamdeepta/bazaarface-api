@@ -23,14 +23,33 @@ const user = gql`
     phone: String!
     company_name: String
     company_website: String
-    country: String!
+    country: String
     city: String!
     isBuyer: Boolean
     isSeller: Boolean
+    buyers: [SingleBuyer]
+    sellers: [SingleSeller]
     profile_image: String
     cover_image: String
     isAdmin: Boolean
     status: Int
+  }
+
+  type SingleBuyer {
+    profile_image: String
+    cover_image: String
+    description: String
+    designation: String
+    followers: [String]
+    following: [String]
+  }
+
+  type SingleSeller {
+    profile_image: String
+    cover_image: String
+    description: String
+    followers: [String]
+    following: [String]
   }
 
   type successInfo {

@@ -72,7 +72,7 @@ class ImageResolver {
 
           let result = await upload(params).catch(console.log);
 
-          const pro_pic = await User.findOneAndUpdate(
+          const pro_pics = await User.findOneAndUpdate(
             { email: email },
             {
               $set: { profile_image: params.Key },
@@ -80,8 +80,8 @@ class ImageResolver {
             { new: true }
           );
 
-          if (pro_pic) {
-            const seller_user_id = pro_pic._id.toString();
+          if (pro_pics) {
+            const seller_user_id = pro_pics._id.toString();
             const pro_pic_seller = await Seller.findOneAndUpdate(
               { user_id: seller_user_id },
               {
@@ -90,7 +90,7 @@ class ImageResolver {
               { new: true }
             );
 
-            const buyer_user_id = pro_pic._id.toString();
+            const buyer_user_id = pro_pics._id.toString();
             const pro_pic_buyer = await Buyer.findOneAndUpdate(
               { user_id: buyer_user_id },
               {
