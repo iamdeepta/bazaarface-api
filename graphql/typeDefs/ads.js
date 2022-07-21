@@ -108,7 +108,7 @@ const ads = gql`
     getAdDetail(id: ID!): Ads
     getAdMoreLikeThis(category_id: ID!): [MoreLikeThisAd]
     getAdFilter(
-      category_id: ID
+      category_id: String
       ad_for: String
       sort_by: String
       user_type: String

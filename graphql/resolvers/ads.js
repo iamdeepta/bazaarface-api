@@ -1,6 +1,7 @@
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const dotenv = require("dotenv");
 const AdImageResolver = require("./ad_image_resolvers");
+const mongoose = require("mongoose");
 
 dotenv.config();
 
@@ -156,27 +157,28 @@ module.exports = {
       var updates = {};
       var sorts = {};
 
-      if (category_id !== "" && category_id !== undefined) {
+      if (category_id.length > 0) {
         updates.category = category_id;
       }
-      if (ad_for !== "" && ad_for !== undefined) {
+      if (ad_for.length > 0) {
         updates.ad_for = ad_for;
       }
-      if (user_type !== "" && user_type !== undefined) {
+      if (user_type.length > 0) {
         updates.user_type = user_type;
       }
-      if (type !== "" && type !== undefined) {
+
+      if (type.length > 0) {
         updates.type = type;
       }
-      if (country !== "" && country !== undefined) {
+      if (country.length > 0) {
         updates.country = country;
       }
 
-      if (sort_by !== "" && sort_by !== undefined) {
+      if (sort_by.length > 0) {
         if (sort_by === "price_high") {
           sorts.price = -1;
         } else if (sort_by === "price_low") {
-          sorts.price = 1;
+          sorts.price = 0;
         } else if (sort_by === "date_new") {
           sorts.createdAt = -1;
         } else if (sort_by === "date_old") {
@@ -187,10 +189,10 @@ module.exports = {
       }
 
       try {
-        var ad;
+        // var ad;
         var ads = [];
-        if (search_text !== undefined && search_text !== "") {
-          ad = await Ad.aggregate([
+        if (search_text.length > 0) {
+          const ad = await Ad.aggregate([
             { $match: { $text: { $search: search_text } } },
             {
               $addFields: {
@@ -233,9 +235,19 @@ module.exports = {
             },
           ])
             .sort(sorts)
+            .collation({ locale: "en_US", numericOrdering: true })
             .limit(limit);
+
+          if (ad) {
+            for (var i = 0; i < ad.length; i++) {
+              ads.push({ ...ad[i], id: ad[i]._id });
+            }
+            return ads;
+          } else {
+            throw new Error("Ad not found");
+          }
         } else {
-          ad = await Ad.aggregate([
+          const ad = await Ad.aggregate([
             { $match: updates },
             {
               $addFields: {
@@ -278,16 +290,20 @@ module.exports = {
             },
           ])
             .sort(sorts)
+            .collation({ locale: "en_US", numericOrdering: true })
             .limit(limit);
-        }
 
-        if (ad) {
-          for (var i = 0; i < ad.length; i++) {
-            ads.push({ ...ad[i], id: ad[i]._id });
+          if (ad) {
+            for (var i = 0; i < ad.length; i++) {
+              ads.push({
+                ...ad[i],
+                id: ad[i]._id,
+              });
+            }
+            return ads;
+          } else {
+            throw new Error("Ad not found");
           }
-          return ads;
-        } else {
-          throw new Error("Ad not found");
         }
       } catch (err) {
         throw new Error(err);
