@@ -11,7 +11,7 @@ const sellerSchema = new Schema(
     following: { type: Array, default: [] },
     total_followers: { type: Number, default: 0 },
     total_following: { type: Number, default: 0 },
-    description: { type: String, default: null },
+    description: { type: String, default: "Set your description here..." },
     user_type: { type: String, default: null },
     key_facts: {
       type: Object,

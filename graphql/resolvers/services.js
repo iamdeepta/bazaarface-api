@@ -22,9 +22,9 @@ module.exports = {
         throw new Error(err);
       }
     },
-    async getSellerService(_, { id }, context) {
+    async getSellerService(_, { user_id }, context) {
       try {
-        const service = await Service.findById(id);
+        const service = await Service.find({ user_id: user_id });
         if (service) {
           return service;
         } else {

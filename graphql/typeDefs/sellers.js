@@ -77,7 +77,7 @@ const sellers = gql`
     getSellers: [Sellers]
     getSeller(id: ID!): Sellers
     getSellerServices: [Services]
-    getSellerService(id: ID!): Services
+    getSellerService(user_id: ID!): [Services]
     getSellerFollowersList(id: ID!): [SellersFollowersList]
     getTotalSeller: Int
   }
