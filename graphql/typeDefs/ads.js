@@ -2,6 +2,7 @@ const { gql } = require("apollo-server");
 
 const ads = gql`
   scalar Upload
+  scalar DateTime
 
   type Ads {
     id: ID!
@@ -43,6 +44,9 @@ const ads = gql`
     phone: String
     image: [String]
     adtypes: [AdTypes]
+    country: String
+    createdAt: DateTime
+    category: String
     users: [User]
     sellers: [Seller]
     buyers: [Buyer]
@@ -105,7 +109,7 @@ const ads = gql`
     getAds: [Ads]
     getAd(id: ID!): Ads
     getTenAds: [Ads]
-    getAdDetail(id: ID!): Ads
+    getAdDetail(id: ID!): MoreLikeThisAd
     getAdMoreLikeThis(category_id: ID!): [MoreLikeThisAd]
     getAdFilter(
       category_id: String

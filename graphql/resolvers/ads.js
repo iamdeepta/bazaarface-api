@@ -58,53 +58,52 @@ module.exports = {
     //ad detail
     async getAdDetail(_, { id }, context) {
       try {
-        const ad = await Ad.findOne({ _id: id });
-        const user = await User.findOne({ _id: ad.user_id });
-        const country = await Country.findOne({ _id: ad.country });
-        if (ad && user) {
-          var seller;
-          var buyer;
-          if (user.user_type === "Seller") {
-            seller = await Seller.findOne({ user_id: ad.user_id });
-          } else {
-            buyer = await Buyer.findOne({ user_id: ad.user_id });
-          }
+        const ad = await Ad.aggregate([
+          { $match: { _id: mongoose.Types.ObjectId(id) } },
+          {
+            $addFields: {
+              type: { $toObjectId: "$type" },
+              user_id: { $toObjectId: "$user_id" },
+              users_id: { $toString: "$user_id" },
+            },
+          },
+          {
+            $lookup: {
+              from: "adtypes",
+              localField: "type",
+              foreignField: "_id",
+              as: "adtypes",
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "user_id",
+              foreignField: "_id",
+              as: "users",
+            },
+          },
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "sellers",
+            },
+          },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
+        ]);
 
-          if (buyer === undefined) {
-            return {
-              ...ad._doc,
-              id: ad._id,
-              country: country.name,
-              user: {
-                firstname: user.firstname,
-                lastname: user.lastname,
-                company_name: user.company_name,
-                city: user.city,
-                profile_image: user.profile_image,
-                seller: {
-                  profile_image: seller.profile_image,
-                },
-              },
-            };
-          } else if (seller === undefined) {
-            return {
-              ...ad._doc,
-              id: ad._id,
-              user: {
-                firstname: user.firstname,
-                lastname: user.lastname,
-                company_name: user.company_name,
-                city: user.city,
-                country: user.country,
-                profile_image: user.profile_image,
-                phone: user.phone,
-                buyer: {
-                  profile_image: buyer.profile_image,
-                  designation: buyer.designation,
-                },
-              },
-            };
-          }
+        if (ad) {
+          //console.log(product[0]);
+          return { ...ad[0], id: ad[0]._id };
         } else {
           throw new Error("Ad not found");
         }
