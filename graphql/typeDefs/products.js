@@ -134,6 +134,7 @@ const products = gql`
 
   type Query {
     getProducts(category_id: ID, country_id: [String], limit: Int): [Products]
+    getSellerProducts(user_id: ID, user_type: String, limit: Int): [Products]
     getProduct(id: ID!): Products
     getProductsMoreLikeThis(category_id: ID!): [Products]
     getAddToAuctionModal(id: ID!, user_id: ID!): Products

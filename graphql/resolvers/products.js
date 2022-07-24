@@ -84,6 +84,63 @@ module.exports = {
       }
     },
 
+    //get seller products
+    async getSellerProducts(parent, args, context) {
+      const { user_id, user_type, limit } = args;
+      var updates = {};
+
+      try {
+        var products = [];
+        const product = await Product.aggregate([
+          { $match: { user_id: user_id, user_type: user_type } },
+          {
+            $addFields: {
+              user_id: { $toObjectId: "$user_id" },
+              users_id: { $toString: "$user_id" },
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "user_id",
+              foreignField: "_id",
+              as: "users",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "sellers",
+            },
+          },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
+        ])
+          .sort({ createdAt: -1 })
+          .limit(limit);
+
+        for (var i = 0; i < product.length; i++) {
+          products.push({
+            ...product[i],
+            id: product[i]._id,
+          });
+        }
+        //console.log(products);
+        return products;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
     //get single product
     async getProduct(_, { id }, context) {
       try {
