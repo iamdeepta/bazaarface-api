@@ -115,6 +115,7 @@ module.exports = {
     //get more like this ad
     async getAdMoreLikeThis(_, { category_id }, context) {
       try {
+        var ads = [];
         const ad = await Ad.aggregate([
           { $match: { category: category_id } },
           { $addFields: { type: { $toObjectId: "$type" } } },
@@ -129,7 +130,13 @@ module.exports = {
         ]);
 
         if (ad) {
-          return ad;
+          for (var i = 0; i < ad.length; i++) {
+            ads.push({
+              ...ad[i],
+              id: ad[i]._id,
+            });
+          }
+          return ads;
         } else {
           throw new Error("Ad not found");
         }
