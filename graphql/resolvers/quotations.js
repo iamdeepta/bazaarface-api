@@ -294,7 +294,7 @@ module.exports = {
           //send noti
 
           if (res) {
-            res_id = res._id.toString();
+            var res_id = res._id.toString();
             const notification = new Notifications({
               type: "received_quotation",
               visitor_id: sender_id,
@@ -313,7 +313,7 @@ module.exports = {
 
           //send activity
           if (res && sender_user_type === "Buyer") {
-            res_id = res._id.toString();
+            var res_id = res._id.toString();
             const activity = new BuyerActivities({
               type: "quotation",
               visitor_id: receiver_id,
@@ -374,7 +374,7 @@ module.exports = {
         //console.log(quotation);
 
         if (quotation) {
-          res_id = quotation._id.toString();
+          var res_id = quotation._id.toString();
           const notification = new Notifications({
             type: "accepted_quotation",
             visitor_id: quotation.sender_id,
@@ -421,7 +421,7 @@ module.exports = {
         );
 
         if (quotation) {
-          res_id = quotation._id.toString();
+          var res_id = quotation._id.toString();
           const notification = new Notifications({
             type: "rejected_quotation",
             visitor_id: quotation.sender_id,

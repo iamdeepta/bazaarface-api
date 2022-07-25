@@ -267,7 +267,7 @@ module.exports = {
 
           //send noti
           if (res) {
-            res_id = res._id.toString();
+            var res_id = res._id.toString();
             const notification = new Notifications({
               type: "placed_bid",
               visitor_id: sender_id,
@@ -284,7 +284,7 @@ module.exports = {
 
           //send activity
           if (res) {
-            res_id = res._id.toString();
+            var res_id = res._id.toString();
             const activity = new BuyerActivities({
               type: "bid",
               visitor_id: receiver_id,

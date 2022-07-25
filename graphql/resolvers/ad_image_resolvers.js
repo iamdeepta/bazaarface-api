@@ -155,7 +155,7 @@ class AdImageResolver {
 
         //send activity
         if (res && user_type === "Buyer") {
-          res_id = res._id.toString();
+          var res_id = res._id.toString();
           const activity = new BuyerActivities({
             type: "ad",
             user_id: user_id,
