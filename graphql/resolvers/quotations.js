@@ -14,6 +14,7 @@ const Buyer = require("../../models/Buyer");
 const Category = require("../../models/ProductCategory");
 const Quotation = require("../../models/Quotation");
 const Notifications = require("../../models/Notification");
+const BuyerActivities = require("../../models/BuyerActivity");
 
 module.exports = {
   Query: {
@@ -308,6 +309,23 @@ module.exports = {
             const res_noti = await notification.save();
 
             // console.log(res_id);
+          }
+
+          //send activity
+          if (res && sender_user_type === "Buyer") {
+            res_id = res._id.toString();
+            const activity = new BuyerActivities({
+              type: "quotation",
+              visitor_id: receiver_id,
+              user_id: sender_id,
+              visitor_user_type: receiver_user_type,
+              user_type: sender_user_type,
+              product_id,
+              quotation_id: res_id,
+              text: "You sent you a quotation",
+            });
+
+            const res_act = await activity.save();
           }
 
           return {

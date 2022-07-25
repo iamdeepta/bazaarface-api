@@ -14,6 +14,7 @@ const Buyer = require("../../models/Buyer");
 const Category = require("../../models/ProductCategory");
 const Notifications = require("../../models/Notification");
 const Post = require("../../models/Post");
+const BuyerActivities = require("../../models/BuyerActivity");
 
 module.exports = {
   Query: {
@@ -304,6 +305,25 @@ module.exports = {
             },
             { new: true }
           );
+
+          if (post && user_type === "Buyer") {
+            //send activity
+            if (user_check.id !== post.user_id) {
+              var post_id = post._id.toString();
+              const activity = new BuyerActivities({
+                type: "like_post",
+                visitor_id: post.user_id,
+                user_id: user_id,
+                visitor_user_type: post.user_type,
+                user_type: user_type,
+                post_id: post_id,
+                text: "You liked a post",
+              });
+
+              const res_activity = await activity.save();
+            }
+          }
+
           return {
             ...post._doc,
             message: "You liked this post.",

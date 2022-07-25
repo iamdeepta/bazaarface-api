@@ -13,6 +13,7 @@ const Seller = require("../../models/Seller");
 const Buyer = require("../../models/Buyer");
 const Category = require("../../models/ProductCategory");
 const Notifications = require("../../models/Notification");
+const BuyerActivities = require("../../models/BuyerActivity");
 
 module.exports = {
   Query: {
@@ -143,6 +144,7 @@ module.exports = {
 
     //get single product
     async getProduct(_, { id }, context) {
+      const check_user = await checkAuth(context);
       try {
         const product = await Product.aggregate([
           { $match: { _id: mongoose.Types.ObjectId(id) } },
@@ -171,6 +173,21 @@ module.exports = {
         ]);
 
         if (product) {
+          //send activity
+          if (check_user.id !== product[0].user_id) {
+            var prod_id = product[0]._id.toString();
+            const activity = new BuyerActivities({
+              type: "visit_product",
+              visitor_id: product[0].user_id,
+              user_id: user_check.id,
+              visitor_user_type: "Seller",
+              user_type: "Buyer",
+              product_id: prod_id,
+              text: "You visited a product",
+            });
+
+            const res_activity = await activity.save();
+          }
           //console.log(product[0]);
           return { ...product[0], id: product[0]._id };
         } else {

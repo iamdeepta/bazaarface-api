@@ -17,6 +17,7 @@ const Message = require("../../models/Message");
 const Conversation = require("../../models/Conversation");
 const Size = require("../../models/Size");
 const Notifications = require("../../models/Notification");
+const BuyerActivities = require("../../models/BuyerActivity");
 
 const { PubSub } = require("graphql-subscriptions");
 
@@ -279,6 +280,23 @@ module.exports = {
             });
 
             const res_noti = await notification.save();
+          }
+
+          //send activity
+          if (res) {
+            res_id = res._id.toString();
+            const activity = new BuyerActivities({
+              type: "bid",
+              visitor_id: receiver_id,
+              user_id: sender_id,
+              visitor_user_type: receiver_user_type,
+              user_type: sender_user_type,
+              product_id: product_id,
+              bid_id: res_id,
+              text: "You have placed a bid",
+            });
+
+            const res_act = await activity.save();
           }
 
           pubsub.publish("NEW_BID", {

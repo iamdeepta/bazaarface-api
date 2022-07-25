@@ -10,6 +10,7 @@ const Seller = require("../../models/Seller");
 const Buyer = require("../../models/Buyer");
 const User = require("../../models/User");
 const Notifications = require("../../models/Notification");
+const BuyerActivities = require("../../models/BuyerActivity");
 
 module.exports = {
   Query: {
@@ -34,12 +35,24 @@ module.exports = {
               type: "visited",
               visitor_id: user_check.id,
               user_id: seller.user_id,
-              visitor_user_type: user_check.user_type,
+              visitor_user_type: "Buyer",
               user_type: "Seller",
               text: "Someone visited your profile",
             });
 
             const res_noti = await notification.save();
+
+            //send activity
+            const activity = new BuyerActivities({
+              type: "visit_profile",
+              visitor_id: seller.user_id,
+              user_id: user_check.id,
+              visitor_user_type: "Seller",
+              user_type: "Buyer",
+              text: "You visited a profile",
+            });
+
+            const res_activity = await activity.save();
           }
           return seller;
         } else {

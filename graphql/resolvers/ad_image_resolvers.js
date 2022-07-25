@@ -3,6 +3,7 @@ const { promisify } = require("util");
 const { extname } = require("path");
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const Ad = require("../../models/Ad");
+const BuyerActivities = require("../../models/BuyerActivity");
 
 const sharp = require("sharp");
 const { finished } = require("stream");
@@ -151,6 +152,20 @@ class AdImageResolver {
         //console.log(product);
 
         const res = await ad.save();
+
+        //send activity
+        if (res && user_type === "Buyer") {
+          res_id = res._id.toString();
+          const activity = new BuyerActivities({
+            type: "ad",
+            user_id: user_id,
+            user_type: user_type,
+            ad_id: res_id,
+            text: "You have uploaded an ad",
+          });
+
+          const res_act = await activity.save();
+        }
 
         return {
           ...res._doc,

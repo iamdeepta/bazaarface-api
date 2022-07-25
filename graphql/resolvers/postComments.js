@@ -13,6 +13,7 @@ const Post = require("../../models/Post");
 const PostComment = require("../../models/PostComment");
 
 const { PubSub } = require("graphql-subscriptions");
+const BuyerActivity = require("../../models/BuyerActivity");
 
 const pubsub = new PubSub();
 
@@ -154,24 +155,23 @@ module.exports = {
 
           const res = await postComment.save();
 
-          //send noti
+          //send activity
 
-          //   if (res) {
-          //     res_id = res._id.toString();
-          //     const notification = new Notifications({
-          //       type: "received_quotation",
-          //       visitor_id: sender_id,
-          //       user_id: receiver_id,
-          //       visitor_user_type: sender_user_type,
-          //       user_type: receiver_user_type,
-          //       product_id,
-          //       quotation_id: res_id,
-          //       text: "Someone sent you a quotation",
-          //     });
+          if (res && sender_user_type === "Buyer") {
+            //res_id = res._id.toString();
+            const activity = new BuyerActivity({
+              type: "comment_post",
 
-          //     const res_noti = await notification.save();
+              user_id: sender_id,
 
-          //   }
+              user_type: sender_user_type,
+              post_id: post_id,
+
+              text: "You commented on a post",
+            });
+
+            const res_act = await activity.save();
+          }
 
           pubsub.publish("NEW_POST_COMMENT", {
             newPostComment: {

@@ -19,6 +19,7 @@ const notification = require("./notifications");
 const post = require("./posts");
 const postComment = require("./postComments");
 const onboard = require("./onboards");
+const buyerActivity = require("./buyerActivities");
 
 const schemaArray = [
   user,
@@ -42,6 +43,7 @@ const schemaArray = [
   post,
   postComment,
   onboard,
+  buyerActivity,
 ];
 
 module.exports = schemaArray;
