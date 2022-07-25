@@ -53,42 +53,44 @@ module.exports = {
     async getBuyer(_, { id }, context) {
       const user_check = await checkAuth(context);
       try {
-        const buyer = await Buyer.aggregate([
-          { $match: { user_id: id } },
-          {
-            $addFields: {
-              user_id: { $toObjectId: "$user_id" },
+        if (user_check.isAdmin || !user_check.isAdmin) {
+          const buyer = await Buyer.aggregate([
+            { $match: { user_id: id } },
+            {
+              $addFields: {
+                user_id: { $toObjectId: "$user_id" },
+              },
             },
-          },
-          {
-            $lookup: {
-              from: "users",
-              localField: "user_id",
-              foreignField: "_id",
-              as: "users",
+            {
+              $lookup: {
+                from: "users",
+                localField: "user_id",
+                foreignField: "_id",
+                as: "users",
+              },
             },
-          },
-        ]);
+          ]);
 
-        const country = await Country.findOne({
-          _id: buyer[0].users[0].country,
-        });
-        if (buyer) {
-          if (user_check.id !== id) {
-            const notification = new Notifications({
-              type: "visited",
-              visitor_id: user_check.id,
-              user_id: buyer[0].user_id,
-              visitor_user_type: user_check.user_type,
-              user_type: "Buyer",
-              text: "Someone visited your profile",
-            });
+          const country = await Country.findOne({
+            _id: buyer[0].users[0].country,
+          });
+          if (buyer) {
+            if (user_check.id !== id) {
+              const notification = new Notifications({
+                type: "visited",
+                visitor_id: user_check.id,
+                user_id: buyer[0].user_id,
+                visitor_user_type: user_check.user_type,
+                user_type: "Buyer",
+                text: "Someone visited your profile",
+              });
 
-            const res_noti = await notification.save();
+              const res_noti = await notification.save();
+            }
+            return { ...buyer[0], id: buyer[0]._id, country: country.name };
+          } else {
+            throw new Error("Buyer not found");
           }
-          return { ...buyer[0], id: buyer[0]._id, country: country.name };
-        } else {
-          throw new Error("Buyer not found");
         }
       } catch (err) {
         throw new Error(err);
