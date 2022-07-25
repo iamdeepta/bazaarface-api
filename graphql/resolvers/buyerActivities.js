@@ -280,8 +280,6 @@ module.exports = {
               id: activity[i]._id,
               text: text,
             });
-          } else {
-            return null;
           }
         }
         //console.log(quotations[0].users);
