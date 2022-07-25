@@ -168,7 +168,7 @@ module.exports = {
     async updateBuyerDescription(parent, args, context, info) {
       const user_check = await checkAuth(context);
       const { id } = args;
-      const { description, firstname, lastname, country, designation } =
+      const { description, firstname, lastname, country, designation, city } =
         args.input;
 
       const updates = {};
@@ -192,6 +192,10 @@ module.exports = {
 
       if (country !== undefined) {
         updates_for_user.country = country;
+      }
+
+      if (city !== undefined) {
+        updates_for_user.city = city;
       }
 
       // TODO: Make sure user doesnt already exist

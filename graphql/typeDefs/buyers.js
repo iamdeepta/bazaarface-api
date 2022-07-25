@@ -56,6 +56,7 @@ const buyers = gql`
     lastname: String
     designation: String
     country: String
+    city: String
   }
 
   input BuyerWorkHistoryInput {
