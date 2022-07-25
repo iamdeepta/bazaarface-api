@@ -131,6 +131,11 @@ const buyerActivities = gql`
       user_type: String
       limit: Int
     ): [BuyerActivities]
+    getYesterdayBuyerActivities(
+      user_id: ID
+      user_type: String
+      limit: Int
+    ): [BuyerActivities]
     # getQuotationNotifications(
     #   user_id: ID
     #   user_type: String

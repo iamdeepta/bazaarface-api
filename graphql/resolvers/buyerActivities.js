@@ -17,7 +17,7 @@ const BuyerActivity = require("../../models/BuyerActivity");
 
 module.exports = {
   Query: {
-    //get buyer activities
+    //get buyer activities for today
     async getBuyerActivities(parent, args, context) {
       const { user_id, user_type, limit } = args;
 
@@ -108,35 +108,181 @@ module.exports = {
           .limit(limit);
 
         var text = "";
+        var today_date = new Date().getTime();
         for (var i = 0; i < activity.length; i++) {
-          if (activity[i].type === "quotation") {
-            text = `You sent a quotation to ${activity[i].users[0].company_name} for product ${activity[i].products[0].name}`;
-          }
+          var activity_date = new Date(activity[0].createdAt).getTime();
+          var difference_of_date =
+            (today_date - activity_date) / (1000 * 3600 * 24);
+          //console.log(difference_of_date);
+          if (difference_of_date < 1) {
+            if (activity[i].type === "quotation") {
+              text = `You sent a quotation to ${activity[i].users[0].company_name} for product ${activity[i].products[0].name}`;
+            }
 
-          if (activity[i].type === "visit_profile") {
-            text = `You visited ${activity[i].users[0].company_name}'s profile`;
-          }
-          if (activity[i].type === "visit_product") {
-            text = `You visited ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
-          }
-          if (activity[i].type === "bid") {
-            text = `You placed bid to ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
-          }
-          if (activity[i].type === "ad") {
-            text = `You have uploaded an ad for ${activity[i].ad[0].name} product`;
-          }
-          if (activity[i].type === "comment_post") {
-            text = `You have commented on this post: ${activity[i].post[0].text}`;
-          }
-          if (activity[i].type === "like_post") {
-            text = `You have liked this post: ${activity[i].post[0].text}`;
-          }
+            if (activity[i].type === "visit_profile") {
+              text = `You visited ${activity[i].users[0].company_name}'s profile`;
+            }
+            if (activity[i].type === "visit_product") {
+              text = `You visited ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
+            }
+            if (activity[i].type === "bid") {
+              text = `You placed bid to ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
+            }
+            if (activity[i].type === "ad") {
+              text = `You have uploaded an ad for ${activity[i].ad[0].name} product`;
+            }
+            if (activity[i].type === "comment_post") {
+              text = `You have commented on this post: ${activity[i].post[0].text}`;
+            }
+            if (activity[i].type === "like_post") {
+              text = `You have liked this post: ${activity[i].post[0].text}`;
+            }
 
-          activities.push({
-            ...activity[i],
-            id: activity[i]._id,
-            text: text,
-          });
+            activities.push({
+              ...activity[i],
+              id: activity[i]._id,
+              text: text,
+            });
+          } else {
+            return [{ text: "There is no activity for today." }];
+          }
+        }
+        //console.log(quotations[0].users);
+        return activities;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //get buyer activities for yesterday
+    async getYesterdayBuyerActivities(parent, args, context) {
+      const { user_id, user_type, limit } = args;
+
+      try {
+        var activities = [];
+        const activity = await BuyerActivity.aggregate([
+          { $match: { user_id: user_id, user_type: user_type } },
+          {
+            $addFields: {
+              visitor_id: { $toObjectId: "$visitor_id" },
+              visitors_id: { $toString: "$visitor_id" },
+              user_id: { $toObjectId: "$user_id" },
+              users_id: { $toString: "$user_id" },
+              product_id: { $toObjectId: "$product_id" },
+              quotation_id: { $toObjectId: "$quotation_id" },
+              ad_id: { $toObjectId: "$ad_id" },
+              post_id: { $toObjectId: "$post_id" },
+              bid_id: { $toObjectId: "$bid_id" },
+            },
+          },
+          {
+            $lookup: {
+              from: "products",
+              localField: "product_id",
+              foreignField: "_id",
+              as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ad",
+            },
+          },
+          {
+            $lookup: {
+              from: "posts",
+              localField: "post_id",
+              foreignField: "_id",
+              as: "post",
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "visitor_id",
+              foreignField: "_id",
+              as: "visitor",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "visitors_id",
+              foreignField: "user_id",
+              as: "sellers",
+            },
+          },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "visitors_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
+          {
+            $lookup: {
+              from: "quotations",
+              localField: "quotation_id",
+              foreignField: "_id",
+              as: "quotation",
+            },
+          },
+          {
+            $lookup: {
+              from: "bids",
+              localField: "bid_id",
+              foreignField: "_id",
+              as: "bid",
+            },
+          },
+        ])
+          .sort({ createdAt: -1 })
+          .limit(limit);
+
+        var text = "";
+        var today_date = new Date().getTime();
+        for (var i = 0; i < activity.length; i++) {
+          var activity_date = new Date(activity[0].createdAt).getTime();
+          var difference_of_date =
+            (today_date - activity_date) / (1000 * 3600 * 24);
+          //console.log(difference_of_date);
+          if (difference_of_date > 1 && difference_of_date < 2) {
+            if (activity[i].type === "quotation") {
+              text = `You sent a quotation to ${activity[i].users[0].company_name} for product ${activity[i].products[0].name}`;
+            }
+
+            if (activity[i].type === "visit_profile") {
+              text = `You visited ${activity[i].users[0].company_name}'s profile`;
+            }
+            if (activity[i].type === "visit_product") {
+              text = `You visited ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
+            }
+            if (activity[i].type === "bid") {
+              text = `You placed bid to ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
+            }
+            if (activity[i].type === "ad") {
+              text = `You have uploaded an ad for ${activity[i].ad[0].name} product`;
+            }
+            if (activity[i].type === "comment_post") {
+              text = `You have commented on this post: ${activity[i].post[0].text}`;
+            }
+            if (activity[i].type === "like_post") {
+              text = `You have liked this post: ${activity[i].post[0].text}`;
+            }
+
+            activities.push({
+              ...activity[i],
+              id: activity[i]._id,
+              text: text,
+            });
+          } else {
+            return [{ text: "There is no activity for yesterday." }];
+          }
         }
         //console.log(quotations[0].users);
         return activities;
@@ -340,7 +486,6 @@ module.exports = {
         ]);
 
         var text = "";
-
         if (activity) {
           if (activity[0].type === "quotation") {
             text = `You sent a quotation to ${activity[0].users[0].company_name} for product ${activity[0].products[0].name}`;
