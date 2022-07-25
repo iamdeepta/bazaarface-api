@@ -6,7 +6,8 @@ const buyerActivities = gql`
 
   type BuyerActivities {
     id: ID
-    visitor_id: String!
+    type: String
+    visitor_id: String
     visitor: [User]
     user_id: String
     user: [User]

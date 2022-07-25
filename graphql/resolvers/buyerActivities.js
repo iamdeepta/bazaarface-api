@@ -51,7 +51,7 @@ module.exports = {
               from: "ads",
               localField: "ad_id",
               foreignField: "_id",
-              as: "ads",
+              as: "ad",
             },
           },
           {
@@ -59,7 +59,7 @@ module.exports = {
               from: "posts",
               localField: "post_id",
               foreignField: "_id",
-              as: "posts",
+              as: "post",
             },
           },
           {
@@ -123,13 +123,13 @@ module.exports = {
             text = `You placed bid to ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
           }
           if (activity[i].type === "ad") {
-            text = `You have uploaded an ad for ${activity[i].ads[0].name} product`;
+            text = `You have uploaded an ad for ${activity[i].ad[0].name} product`;
           }
           if (activity[i].type === "comment_post") {
-            text = `You have commented on this post: ${activity[i].posts[0].text}`;
+            text = `You have commented on this post: ${activity[i].post[0].text}`;
           }
           if (activity[i].type === "like_post") {
-            text = `You have liked this post: ${activity[i].posts[0].text}`;
+            text = `You have liked this post: ${activity[i].post[0].text}`;
           }
 
           activities.push({
@@ -286,7 +286,7 @@ module.exports = {
               from: "ads",
               localField: "ad_id",
               foreignField: "_id",
-              as: "ads",
+              as: "ad",
             },
           },
           {
@@ -294,7 +294,7 @@ module.exports = {
               from: "posts",
               localField: "post_id",
               foreignField: "_id",
-              as: "posts",
+              as: "post",
             },
           },
           {
@@ -356,13 +356,13 @@ module.exports = {
             text = `You placed bid to ${activity[0].users[0].company_name}'s product ${activity[0].products[0].name}`;
           }
           if (activity[0].type === "ad") {
-            text = `You have uploaded an ad for ${activity[0].ads[0].name} product`;
+            text = `You have uploaded an ad for ${activity[0].ad[0].name} product`;
           }
           if (activity[0].type === "comment_post") {
-            text = `You have commented on this post: ${activity[0].posts[0].text}`;
+            text = `You have commented on this post: ${activity[0].post[0].text}`;
           }
           if (activity[0].type === "like_post") {
-            text = `You have liked this post: ${activity[0].posts[0].text}`;
+            text = `You have liked this post: ${activity[0].post[0].text}`;
           }
           //console.log(product[0]);
           return { ...activity[0], id: activity[0]._id, text: text };
