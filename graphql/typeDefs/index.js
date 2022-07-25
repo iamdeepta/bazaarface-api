@@ -20,6 +20,7 @@ const post = require("./posts");
 const postComment = require("./postComments");
 const onboard = require("./onboards");
 const buyerActivity = require("./buyerActivities");
+const announcement = require("./announcements");
 
 const schemaArray = [
   user,
@@ -44,6 +45,7 @@ const schemaArray = [
   postComment,
   onboard,
   buyerActivity,
+  announcement,
 ];
 
 module.exports = schemaArray;
