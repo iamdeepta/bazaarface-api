@@ -281,7 +281,7 @@ module.exports = {
               text: text,
             });
           } else {
-            return [{ text: "There is no activity for yesterday." }];
+            return null;
           }
         }
         //console.log(quotations[0].users);
