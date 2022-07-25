@@ -12,7 +12,7 @@ const buyerSchema = new Schema(
     following: { type: Array, default: [] },
     total_followers: { type: Number, default: 0 },
     total_following: { type: Number, default: 0 },
-    description: { type: String, default: null },
+    description: { type: String, default: "No description available." },
     user_type: { type: String, default: null },
     work_history: { type: Array, default: [] },
     // uploaded_products: { type: Array, default: [] },

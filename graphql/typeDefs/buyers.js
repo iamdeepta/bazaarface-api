@@ -12,6 +12,7 @@ const buyers = gql`
     cover_image: String
     user_type: String
     work_history: [WorkHistory]
+    work_histories: [WorkHistories]
     followers: [String]
     following: [String]
     total_followers: Int
@@ -32,12 +33,19 @@ const buyers = gql`
   }
 
   type WorkHistory {
-    id: String
+    work_history_id: String
     designation: String
     location: String
     year_range: String
     message: String
     success: Boolean
+  }
+
+  type WorkHistories {
+    work_history_id: String
+    designation: String
+    location: String
+    year_range: String
   }
 
   type BuyersFollowersList {

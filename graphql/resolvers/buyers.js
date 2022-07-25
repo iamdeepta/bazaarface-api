@@ -87,7 +87,21 @@ module.exports = {
 
               const res_noti = await notification.save();
             }
-            return { ...buyer[0], id: buyer[0]._id, country: country.name };
+            // var work_histories = [];
+            // for (var i = 0; i < buyer[0].work_history.length; i++) {
+            //   work_histories.push({
+            //     id: buyer[0].work_history[i].id,
+            //     designation: buyer[0].work_history[i].designation,
+            //     location: buyer[0].work_history[i].location,
+            //     year_range: buyer[0].work_history[i].year_range,
+            //   });
+            // }
+            return {
+              ...buyer[0],
+              id: buyer[0]._id,
+              country: country.name,
+              //work_histories: work_histories,
+            };
           } else {
             throw new Error("Buyer not found");
           }
