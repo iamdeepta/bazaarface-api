@@ -35,6 +35,7 @@ module.exports = {
               quotation_id: { $toObjectId: "$quotation_id" },
               ad_id: { $toObjectId: "$ad_id" },
               post_id: { $toObjectId: "$post_id" },
+              blog_id: { $toObjectId: "$blog_id" },
               bid_id: { $toObjectId: "$bid_id" },
             },
           },
@@ -60,6 +61,14 @@ module.exports = {
               localField: "post_id",
               foreignField: "_id",
               as: "post",
+            },
+          },
+          {
+            $lookup: {
+              from: "blogs",
+              localField: "blog_id",
+              foreignField: "_id",
+              as: "blog",
             },
           },
           {
@@ -116,17 +125,17 @@ module.exports = {
           //console.log(difference_of_date);
           if (difference_of_date < 1) {
             if (activity[i].type === "quotation") {
-              text = `You sent a quotation to ${activity[i].users[0].company_name} for product ${activity[i].products[0].name}`;
+              text = `You sent a quotation to ${activity[i].visitor[0].company_name} for product ${activity[i].products[0].name}`;
             }
 
             if (activity[i].type === "visit_profile") {
-              text = `You visited ${activity[i].users[0].company_name}'s profile`;
+              text = `You visited ${activity[i].visitor[0].company_name}'s profile`;
             }
             if (activity[i].type === "visit_product") {
-              text = `You visited ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
+              text = `You visited ${activity[i].visitor[0].company_name}'s product ${activity[i].products[0].name}`;
             }
             if (activity[i].type === "bid") {
-              text = `You placed bid to ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
+              text = `You placed bid to ${activity[i].visitor[0].company_name}'s product ${activity[i].products[0].name}`;
             }
             if (activity[i].type === "ad") {
               text = `You have uploaded an ad for ${activity[i].ad[0].name} product`;
@@ -136,6 +145,12 @@ module.exports = {
             }
             if (activity[i].type === "like_post") {
               text = `You have liked this post: ${activity[i].post[0].text}`;
+            }
+            if (activity[i].type === "like_blog") {
+              text = `You have liked this blog: ${activity[i].blog[0].title}`;
+            }
+            if (activity[i].type === "comment_blog") {
+              text = `You have comment on this blog: ${activity[i].blog[0].title}`;
             }
 
             activities.push({
@@ -172,6 +187,7 @@ module.exports = {
               quotation_id: { $toObjectId: "$quotation_id" },
               ad_id: { $toObjectId: "$ad_id" },
               post_id: { $toObjectId: "$post_id" },
+              blog_id: { $toObjectId: "$blog_id" },
               bid_id: { $toObjectId: "$bid_id" },
             },
           },
@@ -197,6 +213,14 @@ module.exports = {
               localField: "post_id",
               foreignField: "_id",
               as: "post",
+            },
+          },
+          {
+            $lookup: {
+              from: "blogs",
+              localField: "blog_id",
+              foreignField: "_id",
+              as: "blog",
             },
           },
           {
@@ -253,17 +277,17 @@ module.exports = {
           //console.log(difference_of_date);
           if (difference_of_date > 1 && difference_of_date < 2) {
             if (activity[i].type === "quotation") {
-              text = `You sent a quotation to ${activity[i].users[0].company_name} for product ${activity[i].products[0].name}`;
+              text = `You sent a quotation to ${activity[i].visitor[0].company_name} for product ${activity[i].products[0].name}`;
             }
 
             if (activity[i].type === "visit_profile") {
-              text = `You visited ${activity[i].users[0].company_name}'s profile`;
+              text = `You visited ${activity[i].visitor[0].company_name}'s profile`;
             }
             if (activity[i].type === "visit_product") {
-              text = `You visited ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
+              text = `You visited ${activity[i].visitor[0].company_name}'s product ${activity[i].products[0].name}`;
             }
             if (activity[i].type === "bid") {
-              text = `You placed bid to ${activity[i].users[0].company_name}'s product ${activity[i].products[0].name}`;
+              text = `You placed bid to ${activity[i].visitor[0].company_name}'s product ${activity[i].products[0].name}`;
             }
             if (activity[i].type === "ad") {
               text = `You have uploaded an ad for ${activity[i].ad[0].name} product`;
@@ -273,6 +297,12 @@ module.exports = {
             }
             if (activity[i].type === "like_post") {
               text = `You have liked this post: ${activity[i].post[0].text}`;
+            }
+            if (activity[i].type === "like_blog") {
+              text = `You have liked this blog: ${activity[i].blog[0].title}`;
+            }
+            if (activity[i].type === "comment_blog") {
+              text = `You have comment on this blog: ${activity[i].blog[0].title}`;
             }
 
             activities.push({
@@ -414,6 +444,7 @@ module.exports = {
               quotation_id: { $toObjectId: "$quotation_id" },
               ad_id: { $toObjectId: "$ad_id" },
               post_id: { $toObjectId: "$post_id" },
+              blog_id: { $toObjectId: "$blog_id" },
               bid_id: { $toObjectId: "$bid_id" },
             },
           },
@@ -439,6 +470,14 @@ module.exports = {
               localField: "post_id",
               foreignField: "_id",
               as: "post",
+            },
+          },
+          {
+            $lookup: {
+              from: "blogs",
+              localField: "blog_id",
+              foreignField: "_id",
+              as: "blog",
             },
           },
           {
@@ -486,17 +525,17 @@ module.exports = {
         var text = "";
         if (activity) {
           if (activity[0].type === "quotation") {
-            text = `You sent a quotation to ${activity[0].users[0].company_name} for product ${activity[0].products[0].name}`;
+            text = `You sent a quotation to ${activity[0].visitor[0].company_name} for product ${activity[0].products[0].name}`;
           }
 
           if (activity[0].type === "visit_profile") {
-            text = `You visited ${activity[0].users[0].company_name}'s profile`;
+            text = `You visited ${activity[0].visitor[0].company_name}'s profile`;
           }
           if (activity[0].type === "visit_product") {
-            text = `You visited ${activity[0].users[0].company_name}'s product ${activity[0].products[0].name}`;
+            text = `You visited ${activity[0].visitor[0].company_name}'s product ${activity[0].products[0].name}`;
           }
           if (activity[0].type === "bid") {
-            text = `You placed bid to ${activity[0].users[0].company_name}'s product ${activity[0].products[0].name}`;
+            text = `You placed bid to ${activity[0].visitor[0].company_name}'s product ${activity[0].products[0].name}`;
           }
           if (activity[0].type === "ad") {
             text = `You have uploaded an ad for ${activity[0].ad[0].name} product`;
@@ -506,6 +545,12 @@ module.exports = {
           }
           if (activity[0].type === "like_post") {
             text = `You have liked this post: ${activity[0].post[0].text}`;
+          }
+          if (activity[0].type === "like_blog") {
+            text = `You have liked this blog: ${activity[0].blog[0].title}`;
+          }
+          if (activity[0].type === "comment_blog") {
+            text = `You have comment on this blog: ${activity[0].blog[0].title}`;
           }
           //console.log(product[0]);
           return { ...activity[0], id: activity[0]._id, text: text };

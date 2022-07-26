@@ -6,14 +6,16 @@ const notifications = gql`
 
   type Notifications {
     id: ID!
-    visitor_id: String!
+    visitor_id: String
     visitor: [User]
     user_id: String!
     user: [User]
-    visitor_user_type: String!
-    user_type: String!
-    product_id: String!
+    visitor_user_type: String
+    user_type: String
+    product_id: String
     products: [Product]
+    blog_id: String
+    blogs: [SingleBlog]
     quotation_id: String
     quotation: [Quotation]
     bid_id: String
@@ -63,6 +65,14 @@ const notifications = gql`
     marketplace_quantity: String
     isAuction: Boolean
     isMarketplace: Boolean
+  }
+
+  type SingleBlog {
+    title: String
+    description: String
+    category: String
+    time: String
+    image: [String]
   }
 
   type Quotation {

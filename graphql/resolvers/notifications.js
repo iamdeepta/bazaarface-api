@@ -32,6 +32,7 @@ module.exports = {
               user_id: { $toObjectId: "$user_id" },
               users_id: { $toString: "$user_id" },
               product_id: { $toObjectId: "$product_id" },
+              blog_id: { $toObjectId: "$blog_id" },
               quotation_id: { $toObjectId: "$quotation_id" },
               bid_id: { $toObjectId: "$bid_id" },
             },
@@ -42,6 +43,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "blogs",
+              localField: "blog_id",
+              foreignField: "_id",
+              as: "blogs",
             },
           },
           {
@@ -101,27 +110,30 @@ module.exports = {
             text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
           }
           if (notification[i].type === "visited") {
-            if (notification[i].users[0].user_type === "Buyer") {
-              text = `A buyer from ${notification[i].users[0].city}, ${notification[i].users[0].country} visited your profile`;
+            if (notification[i].visitor[0].user_type === "Buyer") {
+              text = `A buyer from ${notification[i].visitor[0].city} visited your profile`;
             } else {
-              text = `A seller from ${notification[i].users[0].city}, ${notification[i].users[0].country} visited your profile`;
+              text = `A seller from ${notification[i].visitor[0].city} visited your profile`;
             }
           }
           if (notification[i].type === "placed_bid") {
-            if (notification[i].users[0].user_type === "Buyer") {
+            if (notification[i].visitor[0].user_type === "Buyer") {
               text = `A buyer placed bid to your product ${notification[i].products[0].name}`;
             } else {
               text = `A seller placed bid to your product ${notification[i].products[0].name}`;
             }
           }
           if (notification[i].type === "uploaded_to_marketplace") {
-            text = `${notification[i].users[0].company_name} uploaded a new product to marketplace`;
+            text = `${notification[i].visitor[0].company_name} uploaded a new product to marketplace`;
           }
           if (notification[i].type === "uploaded_to_auction") {
-            text = `${notification[i].users[0].company_name} uploaded a new product to auction`;
+            text = `${notification[i].visitor[0].company_name} uploaded a new product to auction`;
           }
           if (notification[i].type === "ending_seller_auction") {
             text = `Your product ${notification[i].products[0].name} in auction is about to end in 12 hours`;
+          }
+          if (notification[i].type === "approve_blog_comment") {
+            text = `Your comment on this blog:  ${notification[i].blogs[0].title} got approved`;
           }
           notifications.push({
             ...notification[i],
@@ -258,6 +270,7 @@ module.exports = {
               user_id: { $toObjectId: "$user_id" },
               users_id: { $toString: "$user_id" },
               product_id: { $toObjectId: "$product_id" },
+              blog_id: { $toObjectId: "$blog_id" },
               quotation_id: { $toObjectId: "$quotation_id" },
               bid_id: { $toObjectId: "$bid_id" },
             },
@@ -268,6 +281,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "blogs",
+              localField: "blog_id",
+              foreignField: "_id",
+              as: "blogs",
             },
           },
           {
@@ -325,24 +346,30 @@ module.exports = {
             text = `Someone rejected a quotation of your product ${notification[0].products[0].name}`;
           }
           if (notification[0].type === "visited") {
-            if (notification[0].users[0].user_type === "Buyer") {
-              text = `A buyer from ${notification[0].users[0].city}, ${notification[0].users[0].country} visited your profile`;
+            if (notification[0].visitor[0].user_type === "Buyer") {
+              text = `A buyer from ${notification[0].visitor[0].city} visited your profile`;
             } else {
-              text = `A seller from ${notification[0].users[0].city}, ${notification[0].users[0].country} visited your profile`;
+              text = `A seller from ${notification[0].visitor[0].city} visited your profile`;
             }
           }
           if (notification[i].type === "placed_bid") {
-            if (notification[i].users[0].user_type === "Buyer") {
+            if (notification[i].visitor[0].user_type === "Buyer") {
               text = `A buyer placed bid to your product ${notification[i].products[0].name}`;
             } else {
               text = `A seller placed bid to your product ${notification[i].products[0].name}`;
             }
           }
           if (notification[0].type === "uploaded_to_marketplace") {
-            text = `${notification[0].users[0].company_name} uploaded a new product to marketplace`;
+            text = `${notification[0].visitor[0].company_name} uploaded a new product to marketplace`;
           }
           if (notification[0].type === "uploaded_to_auction") {
-            text = `${notification[0].users[0].company_name} uploaded a new product to auction`;
+            text = `${notification[0].visitor[0].company_name} uploaded a new product to auction`;
+          }
+          if (notification[i].type === "ending_seller_auction") {
+            text = `Your product ${notification[0].products[0].name} in auction is about to end in 12 hours`;
+          }
+          if (notification[i].type === "approve_blog_comment") {
+            text = `Your comment on this blog: ${notification[0].blogs[0].title} got approved`;
           }
           //console.log(product[0]);
           return { ...notification[0], id: notification[0]._id, text: text };

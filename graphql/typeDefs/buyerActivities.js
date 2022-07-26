@@ -23,6 +23,8 @@ const buyerActivities = gql`
     ad: [Ad]
     post_id: String
     post: [Post]
+    blog_id: String
+    blog: [Blog]
     text: String
     seen_status: Int
     status: Int
@@ -104,6 +106,14 @@ const buyerActivities = gql`
     user_id: String
     user_type: String
     text: String
+    image: [String]
+  }
+
+  type Blog {
+    title: String
+    description: String
+    category: String
+    time: String
     image: [String]
   }
 
