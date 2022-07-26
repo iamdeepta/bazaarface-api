@@ -22,6 +22,8 @@ module.exports = {
       const { category_id, country_id, limit } = args;
       var updates = {};
 
+      updates.isMarketplace = true;
+
       if (category_id !== undefined && category_id !== "") {
         updates.category = category_id;
       }
