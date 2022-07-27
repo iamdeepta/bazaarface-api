@@ -364,7 +364,7 @@ module.exports = {
           .limit(limit);
 
         var text = "";
-        
+
         for (var i = 0; i < product.length; i++) {
           //get color codes with color
           var set_colors = [];
@@ -489,8 +489,20 @@ module.exports = {
         ]);
 
         if (product) {
+          //get color codes with color
+          var set_colors = [];
+          for (var j = 0; j < product[0].colors.length; j++) {
+            const color = await Color.findOne({ name: product[0].colors[j] });
+            set_colors.push({ name: color.name, code: color.code });
+          }
+
+          //console.log(set_colors);
           //console.log(product[0]);
-          return { ...product[0], id: product[0]._id };
+          return {
+            ...product[0],
+            id: product[0]._id,
+            color_with_code: set_colors,
+          };
         } else {
           throw new Error("Product not found");
         }
