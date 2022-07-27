@@ -14,6 +14,7 @@ const Buyer = require("../../models/Buyer");
 const Category = require("../../models/ProductCategory");
 const Notifications = require("../../models/Notification");
 const BuyerActivities = require("../../models/BuyerActivity");
+const Color = require("../../models/Color");
 
 module.exports = {
   Query: {
@@ -363,7 +364,16 @@ module.exports = {
           .limit(limit);
 
         var text = "";
+        var set_colors = [];
         for (var i = 0; i < product.length; i++) {
+          //get color codes with color
+          for (var j = 0; j < product[i].colors.length; j++) {
+            const color = await Color.findOne({ name: product[i].colors[j] });
+            set_colors.push({ name: color.name, code: color.code });
+          }
+
+          //console.log(set_colors);
+
           //send noti
           const remaining_auction_day =
             (new Date().getTime() -
@@ -430,6 +440,7 @@ module.exports = {
             ...product[i],
             id: product[i]._id,
             category: cat.name,
+            color_with_code: set_colors,
           });
         }
         //console.log(products);

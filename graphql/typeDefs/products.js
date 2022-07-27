@@ -11,6 +11,7 @@ const products = gql`
     description: String!
     gender: String!
     colors: [String]
+    color_with_code: [ColorWithCode]
     sizes: [String]
     manufacturer: String
     quantity: String
@@ -43,6 +44,11 @@ const products = gql`
   type successInfoProducts {
     message: String
     success: Boolean
+  }
+
+  type ColorWithCode {
+    name: String
+    code: String
   }
 
   type SingleUser {
