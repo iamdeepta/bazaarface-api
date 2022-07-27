@@ -265,6 +265,35 @@ module.exports = {
 
           const res = await bid.save();
 
+          //set highest bid price
+          if (res) {
+            const product = await Product.findById(res.product_id);
+
+            if (
+              product.highest_bid_price !== "0" ||
+              product.highest_bid_price !== null ||
+              product.highest_bid_price !== undefined
+            ) {
+              if (res.price > product.highest_bid_price) {
+                const bid_price = await Product.findByIdAndUpdate(
+                  res.product_id,
+                  {
+                    $set: { highest_bid_price: res.price },
+                  },
+                  { new: true }
+                );
+              }
+            } else {
+              const bid_price1 = await Product.findByIdAndUpdate(
+                res.product_id,
+                {
+                  $set: { highest_bid_price: res.price },
+                },
+                { new: true }
+              );
+            }
+          }
+
           //send noti
           if (res) {
             var res_id = res._id.toString();
