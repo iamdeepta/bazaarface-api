@@ -173,16 +173,31 @@ module.exports = {
               as: "sellers",
             },
           },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "users_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
         ]);
 
         if (product) {
+          //get color codes with color
+          var set_colors = [];
+          for (var j = 0; j < product[0].colors.length; j++) {
+            const color = await Color.findOne({ name: product[0].colors[j] });
+            set_colors.push({ name: color.name, code: color.code });
+          }
+
           //send activity
           if (check_user.id !== product[0].user_id) {
             var prod_id = product[0]._id.toString();
             const activity = new BuyerActivities({
               type: "visit_product",
               visitor_id: product[0].user_id,
-              user_id: user_check.id,
+              user_id: check_user.id,
               visitor_user_type: "Seller",
               user_type: "Buyer",
               product_id: prod_id,
@@ -192,7 +207,11 @@ module.exports = {
             const res_activity = await activity.save();
           }
           //console.log(product[0]);
-          return { ...product[0], id: product[0]._id };
+          return {
+            ...product[0],
+            id: product[0]._id,
+            color_with_code: set_colors,
+          };
         } else {
           throw new Error("Product not found");
         }
@@ -453,6 +472,7 @@ module.exports = {
 
     //get auction modal view data
     async getAuctionProductModalView(_, { id }, context) {
+      const check_user = await checkAuth(context);
       try {
         const product = await Product.aggregate([
           { $match: { _id: mongoose.Types.ObjectId(id) } },
@@ -494,6 +514,22 @@ module.exports = {
           for (var j = 0; j < product[0].colors.length; j++) {
             const color = await Color.findOne({ name: product[0].colors[j] });
             set_colors.push({ name: color.name, code: color.code });
+          }
+
+          //send activity
+          if (check_user.id !== product[0].user_id) {
+            var prod_id = product[0]._id.toString();
+            const activity = new BuyerActivities({
+              type: "visit_product",
+              visitor_id: product[0].user_id,
+              user_id: check_user.id,
+              visitor_user_type: "Seller",
+              user_type: "Buyer",
+              product_id: prod_id,
+              text: "You visited a product",
+            });
+
+            const res_activity = await activity.save();
           }
 
           //console.log(set_colors);
