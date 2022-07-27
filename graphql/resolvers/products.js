@@ -364,9 +364,10 @@ module.exports = {
           .limit(limit);
 
         var text = "";
-        var set_colors = [];
+        
         for (var i = 0; i < product.length; i++) {
           //get color codes with color
+          var set_colors = [];
           for (var j = 0; j < product[i].colors.length; j++) {
             const color = await Color.findOne({ name: product[i].colors[j] });
             set_colors.push({ name: color.name, code: color.code });
