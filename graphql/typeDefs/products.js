@@ -18,6 +18,7 @@ const products = gql`
     auction_quantity: String
     marketplace_quantity: String
     category: String
+    category_id: String
     fabric: String
     supplier: String
     gsm: String

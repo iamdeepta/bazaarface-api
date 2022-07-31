@@ -538,6 +538,7 @@ module.exports = {
             ...product[0],
             id: product[0]._id,
             color_with_code: set_colors,
+            category_id: product[0].category,
           };
         } else {
           throw new Error("Product not found");
