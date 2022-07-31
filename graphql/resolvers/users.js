@@ -24,6 +24,7 @@ const User = require("../../models/User");
 const Seller = require("../../models/Seller");
 const Buyer = require("../../models/Buyer");
 const Country = require("../../models/Country");
+const Otp = require("../../models/Otp");
 //const passport = require("passport");
 //const OAuth2Strategy = require("passport-oauth2").Strategy;
 const { OAuth2Client } = require("google-auth-library");
@@ -286,6 +287,18 @@ module.exports = {
       }
       // hash password and create an auth token
       password = await bcrypt.hash(password, 12);
+
+      //otp verification
+      const user_otp = await Otp.findOne({ email, otp }).sort({
+        createdAt: -1,
+      });
+      if (!user_otp) {
+        throw new UserInputError("You entered wrong otp", {
+          errors: {
+            otp: "You entered wrong otp",
+          },
+        });
+      }
 
       const newUser = new User({
         firstname,
@@ -562,7 +575,7 @@ module.exports = {
     },
 
     //send otp
-    getSignupOtp(_, { email, otp }) {
+    async getSignupOtp(_, { email }) {
       if (email.trim() === "") {
         throw new Error("Email must not be empty");
       } else {
@@ -572,15 +585,24 @@ module.exports = {
           throw new Error("Email must be a valid email address");
         }
       }
-      if (otp.trim() === "") {
-        throw new Error("OTP must be provided");
-      }
+      const otp = Math.floor(100000 + Math.random() * 999999).toString();
 
-      sendEmail(otp, email);
+      // if (otp.trim() === "") {
+      //   throw new Error("OTP must be provided");
+      // }
+
+      const send_otp = new Otp({ email: email, otp: otp });
+      const res = await send_otp.save();
+
+      if (res) {
+        sendEmail(otp, email);
+      } else {
+        throw new Error("Something went wrong. Try again.");
+      }
     },
 
     //forgot pass otp
-    async getForgotOtp(_, { email, otp }) {
+    async getForgotOtp(_, { email }) {
       if (email.trim() === "") {
         throw new Error("Email must not be empty");
       } else {
@@ -590,20 +612,27 @@ module.exports = {
           throw new Error("Email must be a valid email address");
         }
       }
-      if (otp.trim() === "") {
-        throw new Error("OTP must be provided");
-      }
+
+      // if (otp.trim() === "") {
+      //   throw new Error("OTP must be provided");
+      // }
 
       try {
         const users = await User.findOne({ email: email });
 
         if (users) {
-          sendEmail(otp, email);
+          const otp = Math.floor(100000 + Math.random() * 999999).toString();
+          const send_otp = new Otp({ email: email, otp: otp });
+          const res = await send_otp.save();
 
-          return {
-            message: "OTP sent to your email.",
-            success: true,
-          };
+          if (res) {
+            sendEmail(otp, email);
+
+            return {
+              message: "OTP sent to your email.",
+              success: true,
+            };
+          }
         } else {
           return {
             message: "Your email is not registered.",
@@ -619,12 +648,24 @@ module.exports = {
     async resetPassword(parent, args, context, info) {
       //const user_check = await checkAuth(context);
       //const { userId } = args;
-      const { email, password, confirmPassword } = args.input;
+      const { email, password, confirmPassword, otp } = args.input;
 
       const updates = {};
 
       if (email !== undefined) {
         updates.email = email;
+      }
+
+      //otp verification
+      const user_otp = await Otp.findOne({ email, otp }).sort({
+        createdAt: -1,
+      });
+      if (!user_otp) {
+        throw new UserInputError("You entered wrong otp", {
+          errors: {
+            otp: "You entered wrong otp",
+          },
+        });
       }
 
       try {

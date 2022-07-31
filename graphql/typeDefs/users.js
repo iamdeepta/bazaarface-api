@@ -113,6 +113,7 @@ const user = gql`
     email: String
     password: String
     confirmPassword: String
+    otp: String
   }
 
   input authInput {
@@ -135,11 +136,11 @@ const user = gql`
   type Mutation {
     register(registerInput: RegisterInput): User!
     login(email: String!, password: String!): User!
-    getSignupOtp(email: String!, otp: String!): User
+    getSignupOtp(email: String!): User
     updateUser(userId: ID, updateUserInput: UpdateUserInput): User
     deleteUser(userId: ID!): String!
     googleAuth(input: authInput): successInfo
-    getForgotOtp(email: String!, otp: String!): forgotOtp
+    getForgotOtp(email: String!): forgotOtp
     resetPassword(input: ResetPasswordInput): resetPassword
     uploadObject(email: String!, file: Upload!, bucketName: String!): Object
     uploadCoverImage(email: String!, file: Upload!, bucketName: String!): Object
