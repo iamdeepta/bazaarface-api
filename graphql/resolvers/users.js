@@ -17,6 +17,7 @@ const {
   validateRegisterInput,
   validateLoginInput,
   validateUserUpdateInput,
+  validateRegisterInputMobile,
 } = require("../../util/validators");
 const checkAuth = require("../../util/check-auth");
 //const { SECRET_KEY } = require("../../config");
@@ -253,6 +254,7 @@ module.exports = {
           isSeller,
           profile_image,
           cover_image,
+          isPhone,
         },
       }
     ) {
@@ -273,8 +275,23 @@ module.exports = {
         profile_image,
         cover_image
       );
-      if (!valid) {
-        throw new UserInputError("Errors", { errors });
+      const { valid_mobile, errors_mobile } = validateRegisterInputMobile(
+        firstname,
+        email,
+        password,
+        confirmPassword,
+        otp,
+        phone
+      );
+
+      if (isPhone) {
+        if (!valid_mobile) {
+          throw new UserInputError("Errors", { errors_mobile });
+        }
+      } else {
+        if (!valid) {
+          throw new UserInputError("Errors", { errors });
+        }
       }
       // TODO: Make sure user doesnt already exist
       const user = await User.findOne({ email });

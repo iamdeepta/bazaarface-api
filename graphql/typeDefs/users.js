@@ -86,6 +86,7 @@ const user = gql`
     company_website: String!
     country: String!
     city: String!
+    isPhone: Boolean!
     isBuyer: Boolean!
     isSeller: Boolean!
     profile_image: String!
