@@ -20,17 +20,28 @@ module.exports = {
   Query: {
     //get received quotations
     async getReceivedQuotations(parent, args, context) {
-      const { receiver_id, limit } = args;
+      const { receiver_id, isAd, limit } = args;
+
+      var updates = {};
+
+      if (receiver_id !== undefined && receiver_id !== "") {
+        updates.receiver_id = receiver_id;
+      }
+
+      if (isAd !== undefined && isAd !== "") {
+        updates.isAd = isAd;
+      }
 
       try {
         var quotations = [];
         const quotation = await Quotation.aggregate([
-          { $match: { receiver_id: receiver_id } },
+          { $match: updates },
           {
             $addFields: {
               sender_id: { $toObjectId: "$sender_id" },
               senders_id: { $toString: "$sender_id" },
               product_id: { $toObjectId: "$product_id" },
+              ad_id: { $toObjectId: "$ad_id" },
             },
           },
           {
@@ -39,6 +50,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ads",
             },
           },
           {
@@ -93,6 +112,7 @@ module.exports = {
               sender_id: { $toObjectId: "$sender_id" },
               senders_id: { $toString: "$sender_id" },
               product_id: { $toObjectId: "$product_id" },
+              ad_id: { $toObjectId: "$ad_id" },
             },
           },
           {
@@ -101,6 +121,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ads",
             },
           },
           {
@@ -134,17 +162,28 @@ module.exports = {
 
     //get sent quotations
     async getSentQuotations(parent, args, context) {
-      const { sender_id, limit } = args;
+      const { sender_id, limit, isAd } = args;
+
+      var updates = {};
+
+      if (sender_id !== undefined && sender_id !== "") {
+        updates.sender_id = sender_id;
+      }
+
+      if (isAd !== undefined && isAd !== "") {
+        updates.isAd = isAd;
+      }
 
       try {
         var quotations = [];
         const quotation = await Quotation.aggregate([
-          { $match: { sender_id: sender_id } },
+          { $match: updates },
           {
             $addFields: {
               receiver_id: { $toObjectId: "$receiver_id" },
               receivers_id: { $toString: "$receiver_id" },
               product_id: { $toObjectId: "$product_id" },
+              ad_id: { $toObjectId: "$ad_id" },
             },
           },
           {
@@ -153,6 +192,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ads",
             },
           },
           {
@@ -207,6 +254,7 @@ module.exports = {
               receiver_id: { $toObjectId: "$receiver_id" },
               receivers_id: { $toString: "$receiver_id" },
               product_id: { $toObjectId: "$product_id" },
+              ad_id: { $toObjectId: "$ad_id" },
             },
           },
           {
@@ -215,6 +263,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ads",
             },
           },
           {
@@ -260,8 +316,12 @@ module.exports = {
           sender_user_type,
           receiver_user_type,
           product_id,
+          ad_id,
+          color,
+          size,
           quantity,
           price,
+          isAd,
         },
       },
       context
@@ -274,7 +334,6 @@ module.exports = {
           receiver_id.trim() !== "" &&
           sender_user_type.trim() !== "" &&
           receiver_user_type.trim() !== "" &&
-          product_id.trim() !== "" &&
           quantity.trim() !== "" &&
           price.trim() !== ""
         ) {
@@ -284,9 +343,13 @@ module.exports = {
             sender_user_type,
             receiver_user_type,
             product_id,
+            ad_id,
+            color,
+            size,
             quantity,
             price,
             totalPrice: quantity * price,
+            isAd,
           });
 
           const res = await quotation.save();
@@ -322,7 +385,7 @@ module.exports = {
               user_type: sender_user_type,
               product_id,
               quotation_id: res_id,
-              text: "You sent you a quotation",
+              text: "You sent a quotation",
             });
 
             const res_act = await activity.save();

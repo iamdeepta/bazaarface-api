@@ -11,12 +11,17 @@ const quotations = gql`
     receiver: [User]
     sender_user_type: String!
     receiver_user_type: String!
-    product_id: String!
+    product_id: String
     products: [Product]
+    ad_id: String
+    ads: [Ad]
+    color: String
+    size: String
     quantity: String
     price: String
     totalPrice: String
     status: Int
+    isAd: Boolean
     buyers: [SingleBuyer]
     sellers: [SingleSeller]
     message: String
@@ -58,15 +63,31 @@ const quotations = gql`
     isMarketplace: Boolean
   }
 
+  type Ad {
+    name: String
+    image: [String]
+    description: String
+    phone: String
+    location: String
+    price: String
+    quantity: String
+    ad_for: String
+    type: String
+  }
+
   input QuotationInput {
     sender_id: String!
     receiver_id: String!
     sender_user_type: String
     receiver_user_type: String
     product_id: String
+    ad_id: String
+    color: String
+    size: String
     quantity: String
     price: String
     totalPrice: String
+    isAd: Boolean
   }
 
   input QuotationUpdateInput {
@@ -74,9 +95,13 @@ const quotations = gql`
   }
 
   type Query {
-    getReceivedQuotations(receiver_id: ID, limit: Int): [Quotations]
+    getReceivedQuotations(
+      receiver_id: ID
+      isAd: Boolean
+      limit: Int
+    ): [Quotations]
     getReceivedQuotationModal(id: ID!): Quotations
-    getSentQuotations(sender_id: ID, limit: Int): [Quotations]
+    getSentQuotations(sender_id: ID, isAd: Boolean, limit: Int): [Quotations]
     getSentQuotationModal(id: ID!): Quotations
     # getReceivedQuotationViewModal(id: ID!, user_id: ID!): Quotations
   }
