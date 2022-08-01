@@ -107,7 +107,7 @@ module.exports = {
           .sort({ createdAt: -1 })
           .limit(limit);
 
-        //console.log(notification);
+        //console.log(notification);//
 
         var text = "";
         var today_date = new Date().getTime();
