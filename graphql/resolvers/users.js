@@ -602,7 +602,7 @@ module.exports = {
           throw new Error("Email must be a valid email address");
         }
       }
-      const otp = Math.floor(100000 + Math.random() * 999999).toString();
+      const otp = Math.floor(111111 + Math.random() * 900000).toString();
 
       // if (otp.trim() === "") {
       //   throw new Error("OTP must be provided");
@@ -638,7 +638,7 @@ module.exports = {
         const users = await User.findOne({ email: email });
 
         if (users) {
-          const otp = Math.floor(100000 + Math.random() * 999999).toString();
+          const otp = Math.floor(111111 + Math.random() * 900000).toString();
           const send_otp = new Otp({ email: email, otp: otp });
           const res = await send_otp.save();
 
