@@ -99,47 +99,192 @@ module.exports = {
           .limit(limit);
 
         var text = "";
+        var today_date = new Date().getTime();
         for (var i = 0; i < notification.length; i++) {
-          if (notification[i].type === "received_quotation") {
-            text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
-          }
-          if (notification[i].type === "accepted_quotation") {
-            text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
-          }
-          if (notification[i].type === "rejected_quotation") {
-            text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
-          }
-          if (notification[i].type === "visited") {
-            if (notification[i].visitor[0].user_type === "Buyer") {
-              text = `A buyer from ${notification[i].visitor[0].city} visited your profile`;
-            } else {
-              text = `A seller from ${notification[i].visitor[0].city} visited your profile`;
+          var noti_date = new Date(notification[i].createdAt).getTime();
+          var difference_of_date =
+            (today_date - noti_date) / (1000 * 3600 * 24);
+
+          if (difference_of_date < 1) {
+            if (notification[i].type === "received_quotation") {
+              text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
             }
-          }
-          if (notification[i].type === "placed_bid") {
-            if (notification[i].visitor[0].user_type === "Buyer") {
-              text = `A buyer placed bid to your product ${notification[i].products[0].name}`;
-            } else {
-              text = `A seller placed bid to your product ${notification[i].products[0].name}`;
+            if (notification[i].type === "accepted_quotation") {
+              text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
             }
+            if (notification[i].type === "rejected_quotation") {
+              text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+            }
+            if (notification[i].type === "visited") {
+              if (notification[i].visitor[0].user_type === "Buyer") {
+                text = `A buyer from ${notification[i].visitor[0].city} visited your profile`;
+              } else {
+                text = `A seller from ${notification[i].visitor[0].city} visited your profile`;
+              }
+            }
+            if (notification[i].type === "placed_bid") {
+              if (notification[i].visitor[0].user_type === "Buyer") {
+                text = `A buyer placed bid to your product ${notification[i].products[0].name}`;
+              } else {
+                text = `A seller placed bid to your product ${notification[i].products[0].name}`;
+              }
+            }
+            if (notification[i].type === "uploaded_to_marketplace") {
+              text = `${notification[i].visitor[0].company_name} uploaded a new product to marketplace`;
+            }
+            if (notification[i].type === "uploaded_to_auction") {
+              text = `${notification[i].visitor[0].company_name} uploaded a new product to auction`;
+            }
+            if (notification[i].type === "ending_seller_auction") {
+              text = `Your product ${notification[i].products[0].name} in auction is about to end in 12 hours`;
+            }
+            if (notification[i].type === "approve_blog_comment") {
+              text = `Your comment on this blog:  ${notification[i].blogs[0].title} got approved`;
+            }
+            notifications.push({
+              ...notification[i],
+              id: notification[i]._id,
+              text: text,
+            });
           }
-          if (notification[i].type === "uploaded_to_marketplace") {
-            text = `${notification[i].visitor[0].company_name} uploaded a new product to marketplace`;
+        }
+        //console.log(quotations[0].users);
+        return notifications;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //get yesterday notifications
+    async getYesterdayNotifications(parent, args, context) {
+      const { user_id, user_type, limit } = args;
+
+      try {
+        var notifications = [];
+        const notification = await Notification.aggregate([
+          { $match: { user_id: user_id, user_type: user_type, status: 0 } },
+          {
+            $addFields: {
+              visitor_id: { $toObjectId: "$visitor_id" },
+              visitors_id: { $toString: "$visitor_id" },
+              user_id: { $toObjectId: "$user_id" },
+              users_id: { $toString: "$user_id" },
+              product_id: { $toObjectId: "$product_id" },
+              blog_id: { $toObjectId: "$blog_id" },
+              quotation_id: { $toObjectId: "$quotation_id" },
+              bid_id: { $toObjectId: "$bid_id" },
+            },
+          },
+          {
+            $lookup: {
+              from: "products",
+              localField: "product_id",
+              foreignField: "_id",
+              as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "blogs",
+              localField: "blog_id",
+              foreignField: "_id",
+              as: "blogs",
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "visitor_id",
+              foreignField: "_id",
+              as: "visitor",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "visitors_id",
+              foreignField: "user_id",
+              as: "sellers",
+            },
+          },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "visitors_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
+          {
+            $lookup: {
+              from: "quotations",
+              localField: "quotation_id",
+              foreignField: "_id",
+              as: "quotation",
+            },
+          },
+          {
+            $lookup: {
+              from: "bids",
+              localField: "bid_id",
+              foreignField: "_id",
+              as: "bid",
+            },
+          },
+        ])
+          .sort({ createdAt: -1 })
+          .limit(limit);
+
+        var text = "";
+        var today_date = new Date().getTime();
+        for (var i = 0; i < notification.length; i++) {
+          var noti_date = new Date(notification[i].createdAt).getTime();
+          var difference_of_date =
+            (today_date - noti_date) / (1000 * 3600 * 24);
+
+          if (difference_of_date > 1) {
+            if (notification[i].type === "received_quotation") {
+              text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+            }
+            if (notification[i].type === "accepted_quotation") {
+              text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+            }
+            if (notification[i].type === "rejected_quotation") {
+              text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+            }
+            if (notification[i].type === "visited") {
+              if (notification[i].visitor[0].user_type === "Buyer") {
+                text = `A buyer from ${notification[i].visitor[0].city} visited your profile`;
+              } else {
+                text = `A seller from ${notification[i].visitor[0].city} visited your profile`;
+              }
+            }
+            if (notification[i].type === "placed_bid") {
+              if (notification[i].visitor[0].user_type === "Buyer") {
+                text = `A buyer placed bid to your product ${notification[i].products[0].name}`;
+              } else {
+                text = `A seller placed bid to your product ${notification[i].products[0].name}`;
+              }
+            }
+            if (notification[i].type === "uploaded_to_marketplace") {
+              text = `${notification[i].visitor[0].company_name} uploaded a new product to marketplace`;
+            }
+            if (notification[i].type === "uploaded_to_auction") {
+              text = `${notification[i].visitor[0].company_name} uploaded a new product to auction`;
+            }
+            if (notification[i].type === "ending_seller_auction") {
+              text = `Your product ${notification[i].products[0].name} in auction is about to end in 12 hours`;
+            }
+            if (notification[i].type === "approve_blog_comment") {
+              text = `Your comment on this blog:  ${notification[i].blogs[0].title} got approved`;
+            }
+            notifications.push({
+              ...notification[i],
+              id: notification[i]._id,
+              text: text,
+            });
           }
-          if (notification[i].type === "uploaded_to_auction") {
-            text = `${notification[i].visitor[0].company_name} uploaded a new product to auction`;
-          }
-          if (notification[i].type === "ending_seller_auction") {
-            text = `Your product ${notification[i].products[0].name} in auction is about to end in 12 hours`;
-          }
-          if (notification[i].type === "approve_blog_comment") {
-            text = `Your comment on this blog:  ${notification[i].blogs[0].title} got approved`;
-          }
-          notifications.push({
-            ...notification[i],
-            id: notification[i]._id,
-            text: text,
-          });
         }
         //console.log(quotations[0].users);
         return notifications;
@@ -234,22 +379,144 @@ module.exports = {
           .limit(limit);
 
         var text = "";
+        var today_date = new Date().getTime();
         for (var i = 0; i < notification.length; i++) {
-          if (notification[i].type === "received_quotation") {
-            text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
-          }
-          if (notification[i].type === "accepted_quotation") {
-            text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
-          }
-          if (notification[i].type === "rejected_quotation") {
-            text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
-          }
+          var noti_date = new Date(notification[i].createdAt).getTime();
+          var difference_of_date =
+            (today_date - noti_date) / (1000 * 3600 * 24);
+          if (difference_of_date < 1) {
+            if (notification[i].type === "received_quotation") {
+              text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+            }
+            if (notification[i].type === "accepted_quotation") {
+              text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+            }
+            if (notification[i].type === "rejected_quotation") {
+              text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+            }
 
-          notifications.push({
-            ...notification[i],
-            id: notification[i]._id,
-            text: text,
-          });
+            notifications.push({
+              ...notification[i],
+              id: notification[i]._id,
+              text: text,
+            });
+          }
+        }
+        //console.log(quotations[0].users);
+        return notifications;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+
+    //get yesterday quotation notifications
+    async getYesterdayQuotationNotifications(parent, args, context) {
+      const { user_id, user_type, type, limit } = args;
+
+      try {
+        var notifications = [];
+        const notification = await Notification.aggregate([
+          {
+            $match: {
+              user_id: user_id,
+              user_type: user_type,
+              status: 0,
+              type: {
+                $in: [
+                  "received_quotation",
+                  "accepted_quotation",
+                  "rejected_quotation",
+                ],
+              },
+            },
+          },
+          {
+            $addFields: {
+              visitor_id: { $toObjectId: "$visitor_id" },
+              visitors_id: { $toString: "$visitor_id" },
+              user_id: { $toObjectId: "$user_id" },
+              users_id: { $toString: "$user_id" },
+              product_id: { $toObjectId: "$product_id" },
+              quotation_id: { $toObjectId: "$quotation_id" },
+              bid_id: { $toObjectId: "$bid_id" },
+            },
+          },
+          {
+            $lookup: {
+              from: "products",
+              localField: "product_id",
+              foreignField: "_id",
+              as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "visitor_id",
+              foreignField: "_id",
+              as: "visitor",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "visitors_id",
+              foreignField: "user_id",
+              as: "sellers",
+            },
+          },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "visitors_id",
+              foreignField: "user_id",
+              as: "buyers",
+            },
+          },
+          {
+            $lookup: {
+              from: "quotations",
+              localField: "quotation_id",
+              foreignField: "_id",
+              as: "quotation",
+            },
+          },
+          {
+            $lookup: {
+              from: "bids",
+              localField: "bid_id",
+              foreignField: "_id",
+              as: "bid",
+            },
+          },
+        ])
+          .sort({ createdAt: -1 })
+          .limit(limit);
+
+        var text = "";
+        var today_date = new Date().getTime();
+        for (var i = 0; i < notification.length; i++) {
+          var noti_date = new Date(notification[i].createdAt).getTime();
+          var difference_of_date =
+            (today_date - noti_date) / (1000 * 3600 * 24);
+          if (difference_of_date > 1) {
+            if (notification[i].type === "received_quotation") {
+              text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+            }
+            if (notification[i].type === "accepted_quotation") {
+              text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+            }
+            if (notification[i].type === "rejected_quotation") {
+              text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+            }
+
+            notifications.push({
+              ...notification[i],
+              id: notification[i]._id,
+              text: text,
+            });
+          }
         }
         //console.log(quotations[0].users);
         return notifications;

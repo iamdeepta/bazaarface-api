@@ -123,6 +123,19 @@ const notifications = gql`
       type: String
       limit: Int
     ): [Notifications]
+
+    getYesterdayNotifications(
+      user_id: ID
+      user_type: String
+      limit: Int
+    ): [Notifications]
+    getYesterdayQuotationNotifications(
+      user_id: ID
+      user_type: String
+      type: String
+      limit: Int
+    ): [Notifications]
+
     getNotification(id: ID!): Notifications
     getUnseenNotificationCount(user_id: ID, user_type: String): Int
     # getSentQuotations(sender_id: ID, limit: Int): [Quotations]

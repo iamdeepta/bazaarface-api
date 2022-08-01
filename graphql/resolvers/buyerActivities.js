@@ -119,7 +119,7 @@ module.exports = {
         var text = "";
         var today_date = new Date().getTime();
         for (var i = 0; i < activity.length; i++) {
-          var activity_date = new Date(activity[0].createdAt).getTime();
+          var activity_date = new Date(activity[i].createdAt).getTime();
           var difference_of_date =
             (today_date - activity_date) / (1000 * 3600 * 24);
           //console.log(difference_of_date);
@@ -158,8 +158,6 @@ module.exports = {
               id: activity[i]._id,
               text: text,
             });
-          } else {
-            return [{ text: "There is no activity for today." }];
           }
         }
         //console.log(quotations[0].users);
@@ -271,7 +269,7 @@ module.exports = {
         var text = "";
         var today_date = new Date().getTime();
         for (var i = 0; i < activity.length; i++) {
-          var activity_date = new Date(activity[0].createdAt).getTime();
+          var activity_date = new Date(activity[i].createdAt).getTime();
           var difference_of_date =
             (today_date - activity_date) / (1000 * 3600 * 24);
           //console.log(difference_of_date);
