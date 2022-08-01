@@ -377,10 +377,10 @@ module.exports = {
           var res_id = quotation._id.toString();
           const notification = new Notifications({
             type: "accepted_quotation",
-            visitor_id: quotation.sender_id,
-            user_id: quotation.receiver_id,
-            visitor_user_type: quotation.sender_user_type,
-            user_type: quotation.receiver_user_type,
+            visitor_id: quotation.receiver_id,
+            user_id: quotation.sender_id,
+            visitor_user_type: quotation.receiver_user_type,
+            user_type: quotation.sender_user_type,
             product_id: quotation.product_id,
             quotation_id: res_id,
             text: "Someone accepted your quotation",
@@ -424,10 +424,10 @@ module.exports = {
           var res_id = quotation._id.toString();
           const notification = new Notifications({
             type: "rejected_quotation",
-            visitor_id: quotation.sender_id,
-            user_id: quotation.receiver_id,
-            visitor_user_type: quotation.sender_user_type,
-            user_type: quotation.receiver_user_type,
+            visitor_id: quotation.receiver_id,
+            user_id: quotation.sender_id,
+            visitor_user_type: quotation.receiver_user_type,
+            user_type: quotation.sender_user_type,
             product_id: quotation.product_id,
             quotation_id: res_id,
             text: "Someone rejected your quotation",
