@@ -467,19 +467,35 @@ module.exports = {
         //console.log(quotation);
 
         if (quotation) {
-          var res_id = quotation._id.toString();
-          const notification = new Notifications({
-            type: "accepted_quotation",
-            visitor_id: quotation.receiver_id,
-            user_id: quotation.sender_id,
-            visitor_user_type: quotation.receiver_user_type,
-            user_type: quotation.sender_user_type,
-            product_id: quotation.product_id,
-            quotation_id: res_id,
-            text: "Someone accepted your quotation",
-          });
+          if (quotation.isAd) {
+            var res_id = quotation._id.toString();
+            const notification = new Notifications({
+              type: "accepted_quotation",
+              visitor_id: quotation.receiver_id,
+              user_id: quotation.sender_id,
+              visitor_user_type: quotation.receiver_user_type,
+              user_type: quotation.sender_user_type,
+              ad_id: quotation.ad_id,
+              quotation_id: res_id,
+              text: "Someone accepted your ad quotation",
+            });
 
-          const res_noti = await notification.save();
+            const res_noti = await notification.save();
+          } else {
+            var res_id = quotation._id.toString();
+            const notification = new Notifications({
+              type: "accepted_quotation",
+              visitor_id: quotation.receiver_id,
+              user_id: quotation.sender_id,
+              visitor_user_type: quotation.receiver_user_type,
+              user_type: quotation.sender_user_type,
+              product_id: quotation.product_id,
+              quotation_id: res_id,
+              text: "Someone accepted your quotation",
+            });
+
+            const res_noti = await notification.save();
+          }
         }
 
         return {
@@ -514,19 +530,35 @@ module.exports = {
         );
 
         if (quotation) {
-          var res_id = quotation._id.toString();
-          const notification = new Notifications({
-            type: "rejected_quotation",
-            visitor_id: quotation.receiver_id,
-            user_id: quotation.sender_id,
-            visitor_user_type: quotation.receiver_user_type,
-            user_type: quotation.sender_user_type,
-            product_id: quotation.product_id,
-            quotation_id: res_id,
-            text: "Someone rejected your quotation",
-          });
+          if (quotation.isAd) {
+            var res_id = quotation._id.toString();
+            const notification = new Notifications({
+              type: "rejected_quotation",
+              visitor_id: quotation.receiver_id,
+              user_id: quotation.sender_id,
+              visitor_user_type: quotation.receiver_user_type,
+              user_type: quotation.sender_user_type,
+              ad_id: quotation.ad_id,
+              quotation_id: res_id,
+              text: "Someone rejected your ad quotation",
+            });
 
-          const res_noti = await notification.save();
+            const res_noti = await notification.save();
+          } else {
+            var res_id = quotation._id.toString();
+            const notification = new Notifications({
+              type: "rejected_quotation",
+              visitor_id: quotation.receiver_id,
+              user_id: quotation.sender_id,
+              visitor_user_type: quotation.receiver_user_type,
+              user_type: quotation.sender_user_type,
+              product_id: quotation.product_id,
+              quotation_id: res_id,
+              text: "Someone rejected your quotation",
+            });
+
+            const res_noti = await notification.save();
+          }
         }
         return {
           ...quotation._doc,

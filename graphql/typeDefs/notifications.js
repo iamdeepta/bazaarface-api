@@ -117,6 +117,7 @@ const notifications = gql`
     visitor_user_type: String
     user_type: String
     product_id: String
+    ad_id: String
     quotation_id: String
     text: String
   }

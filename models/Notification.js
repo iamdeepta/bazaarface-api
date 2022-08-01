@@ -9,6 +9,7 @@ const notificationSchema = new Schema(
     user_id: { type: String, required: true },
     user_type: { type: String },
     product_id: { type: String, default: null },
+    ad_id: { type: String, default: null },
     bid_id: { type: String, default: null },
     blog_id: { type: String, default: null },
     text: { type: String, required: true },
