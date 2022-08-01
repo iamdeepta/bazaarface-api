@@ -14,6 +14,8 @@ const notifications = gql`
     user_type: String
     product_id: String
     products: [Product]
+    ad_id: String
+    ads: [Ad]
     blog_id: String
     blogs: [SingleBlog]
     quotation_id: String
@@ -68,6 +70,18 @@ const notifications = gql`
     isMarketplace: Boolean
   }
 
+  type Ad {
+    name: String
+    image: [String]
+    description: String
+    phone: String
+    location: String
+    price: String
+    quantity: String
+    ad_for: String
+    type: String
+  }
+
   type SingleBlog {
     title: String
     description: String
@@ -83,6 +97,7 @@ const notifications = gql`
     price: String
     totalPrice: String
     status: Int
+    isAd: Boolean
   }
 
   type Bid {

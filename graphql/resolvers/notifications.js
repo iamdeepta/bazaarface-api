@@ -32,6 +32,7 @@ module.exports = {
               user_id: { $toObjectId: "$user_id" },
               users_id: { $toString: "$user_id" },
               product_id: { $toObjectId: "$product_id" },
+              ad_id: { $toObjectId: "$ad_id" },
               blog_id: { $toObjectId: "$blog_id" },
               quotation_id: { $toObjectId: "$quotation_id" },
               bid_id: { $toObjectId: "$bid_id" },
@@ -43,6 +44,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ads",
             },
           },
           {
@@ -98,6 +107,8 @@ module.exports = {
           .sort({ createdAt: -1 })
           .limit(limit);
 
+        //console.log(notification);
+
         var text = "";
         var today_date = new Date().getTime();
         for (var i = 0; i < notification.length; i++) {
@@ -107,13 +118,25 @@ module.exports = {
 
           if (difference_of_date < 1) {
             if (notification[i].type === "received_quotation") {
-              text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone sent a quotation to your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "accepted_quotation") {
-              text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone accepted a quotation of your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "rejected_quotation") {
-              text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone rejected a quotation of your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "visited") {
               if (notification[i].visitor[0].user_type === "Buyer") {

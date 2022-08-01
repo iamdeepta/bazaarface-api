@@ -357,38 +357,68 @@ module.exports = {
           //send noti
 
           if (res) {
-            var res_id = res._id.toString();
-            const notification = new Notifications({
-              type: "received_quotation",
-              visitor_id: sender_id,
-              user_id: receiver_id,
-              visitor_user_type: sender_user_type,
-              user_type: receiver_user_type,
-              product_id,
-              quotation_id: res_id,
-              text: "Someone sent you a quotation",
-            });
-
-            const res_noti = await notification.save();
+            if (res.isAd) {
+              var res_id = res._id.toString();
+              const notification = new Notifications({
+                type: "received_quotation",
+                visitor_id: sender_id,
+                user_id: receiver_id,
+                visitor_user_type: sender_user_type,
+                user_type: receiver_user_type,
+                ad_id,
+                quotation_id: res_id,
+                text: "Someone sent you an ad quotation",
+              });
+              const res_noti = await notification.save();
+            } else {
+              var res_id = res._id.toString();
+              const notification = new Notifications({
+                type: "received_quotation",
+                visitor_id: sender_id,
+                user_id: receiver_id,
+                visitor_user_type: sender_user_type,
+                user_type: receiver_user_type,
+                product_id,
+                quotation_id: res_id,
+                text: "Someone sent you a quotation",
+              });
+              const res_noti = await notification.save();
+            }
 
             // console.log(res_id);
           }
 
           //send activity
           if (res && sender_user_type === "Buyer") {
-            var res_id = res._id.toString();
-            const activity = new BuyerActivities({
-              type: "quotation",
-              visitor_id: receiver_id,
-              user_id: sender_id,
-              visitor_user_type: receiver_user_type,
-              user_type: sender_user_type,
-              product_id,
-              quotation_id: res_id,
-              text: "You sent a quotation",
-            });
+            if (res.isAd) {
+              var res_id = res._id.toString();
+              const activity = new BuyerActivities({
+                type: "quotation",
+                visitor_id: receiver_id,
+                user_id: sender_id,
+                visitor_user_type: receiver_user_type,
+                user_type: sender_user_type,
+                ad_id,
+                quotation_id: res_id,
+                text: "You sent an ad quotation",
+              });
 
-            const res_act = await activity.save();
+              const res_act = await activity.save();
+            } else {
+              var res_id = res._id.toString();
+              const activity = new BuyerActivities({
+                type: "quotation",
+                visitor_id: receiver_id,
+                user_id: sender_id,
+                visitor_user_type: receiver_user_type,
+                user_type: sender_user_type,
+                product_id,
+                quotation_id: res_id,
+                text: "You sent a quotation",
+              });
+
+              const res_act = await activity.save();
+            }
           }
 
           return {
