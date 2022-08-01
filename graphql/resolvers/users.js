@@ -306,16 +306,16 @@ module.exports = {
       password = await bcrypt.hash(password, 12);
 
       //otp verification
-      const user_otp = await Otp.findOne({ email, otp }).sort({
-        createdAt: -1,
-      });
-      if (!user_otp) {
-        throw new UserInputError("You entered wrong otp", {
-          errors: {
-            otp: "You entered wrong otp",
-          },
-        });
-      }
+      // const user_otp = await Otp.findOne({ email, otp }).sort({
+      //   createdAt: -1,
+      // });
+      // if (!user_otp) {
+      //   throw new UserInputError("You entered wrong otp", {
+      //     errors: {
+      //       otp: "You entered wrong otp",
+      //     },
+      //   });
+      // }
 
       const newUser = new User({
         firstname,
