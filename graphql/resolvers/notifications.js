@@ -726,11 +726,11 @@ module.exports = {
               text = `A seller from ${notification[0].visitor[0].city} visited your profile`;
             }
           }
-          if (notification[i].type === "placed_bid") {
-            if (notification[i].visitor[0].user_type === "Buyer") {
-              text = `A buyer placed bid to your product ${notification[i].products[0].name}`;
+          if (notification[0].type === "placed_bid") {
+            if (notification[0].visitor[0].user_type === "Buyer") {
+              text = `A buyer placed bid to your product ${notification[0].products[0].name}`;
             } else {
-              text = `A seller placed bid to your product ${notification[i].products[0].name}`;
+              text = `A seller placed bid to your product ${notification[0].products[0].name}`;
             }
           }
           if (notification[0].type === "uploaded_to_marketplace") {
@@ -739,10 +739,10 @@ module.exports = {
           if (notification[0].type === "uploaded_to_auction") {
             text = `${notification[0].visitor[0].company_name} uploaded a new product to auction`;
           }
-          if (notification[i].type === "ending_seller_auction") {
+          if (notification[0].type === "ending_seller_auction") {
             text = `Your product ${notification[0].products[0].name} in auction is about to end in 12 hours`;
           }
-          if (notification[i].type === "approve_blog_comment") {
+          if (notification[0].type === "approve_blog_comment") {
             text = `Your comment on this blog: ${notification[0].blogs[0].title} got approved`;
           }
           //console.log(product[0]);
