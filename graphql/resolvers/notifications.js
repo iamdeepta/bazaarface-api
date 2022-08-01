@@ -107,7 +107,7 @@ module.exports = {
           .sort({ createdAt: -1 })
           .limit(limit);
 
-        //console.log(notification);//
+        //console.log(notification);
 
         var text = "";
         var today_date = new Date().getTime();
@@ -193,6 +193,7 @@ module.exports = {
               user_id: { $toObjectId: "$user_id" },
               users_id: { $toString: "$user_id" },
               product_id: { $toObjectId: "$product_id" },
+              ad_id: { $toObjectId: "$ad_id" },
               blog_id: { $toObjectId: "$blog_id" },
               quotation_id: { $toObjectId: "$quotation_id" },
               bid_id: { $toObjectId: "$bid_id" },
@@ -204,6 +205,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ads",
             },
           },
           {
@@ -268,13 +277,25 @@ module.exports = {
 
           if (difference_of_date > 1) {
             if (notification[i].type === "received_quotation") {
-              text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone sent a quotation to your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "accepted_quotation") {
-              text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone accepted a quotation of your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "rejected_quotation") {
-              text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone rejected a quotation of your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "visited") {
               if (notification[i].visitor[0].user_type === "Buyer") {
@@ -344,6 +365,7 @@ module.exports = {
               user_id: { $toObjectId: "$user_id" },
               users_id: { $toString: "$user_id" },
               product_id: { $toObjectId: "$product_id" },
+              ad_id: { $toObjectId: "$ad_id" },
               quotation_id: { $toObjectId: "$quotation_id" },
               bid_id: { $toObjectId: "$bid_id" },
             },
@@ -354,6 +376,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ads",
             },
           },
           {
@@ -409,13 +439,25 @@ module.exports = {
             (today_date - noti_date) / (1000 * 3600 * 24);
           if (difference_of_date < 1) {
             if (notification[i].type === "received_quotation") {
-              text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone sent a quotation to your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "accepted_quotation") {
-              text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone accepted a quotation of your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "rejected_quotation") {
-              text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone rejected a quotation of your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+              }
             }
 
             notifications.push({
@@ -460,6 +502,7 @@ module.exports = {
               user_id: { $toObjectId: "$user_id" },
               users_id: { $toString: "$user_id" },
               product_id: { $toObjectId: "$product_id" },
+              ad_id: { $toObjectId: "$ad_id" },
               quotation_id: { $toObjectId: "$quotation_id" },
               bid_id: { $toObjectId: "$bid_id" },
             },
@@ -470,6 +513,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ads",
             },
           },
           {
@@ -525,13 +576,25 @@ module.exports = {
             (today_date - noti_date) / (1000 * 3600 * 24);
           if (difference_of_date > 1) {
             if (notification[i].type === "received_quotation") {
-              text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone sent a quotation to your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone sent a quotation to your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "accepted_quotation") {
-              text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone accepted a quotation of your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone accepted a quotation of your product ${notification[i].products[0].name}`;
+              }
             }
             if (notification[i].type === "rejected_quotation") {
-              text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+              if (notification[i].quotation[0].isAd) {
+                text = `Someone rejected a quotation of your ad ${notification[i].ads[0].name}`;
+              } else {
+                text = `Someone rejected a quotation of your product ${notification[i].products[0].name}`;
+              }
             }
 
             notifications.push({
@@ -560,6 +623,7 @@ module.exports = {
               user_id: { $toObjectId: "$user_id" },
               users_id: { $toString: "$user_id" },
               product_id: { $toObjectId: "$product_id" },
+              ad_id: { $toObjectId: "$ad_id" },
               blog_id: { $toObjectId: "$blog_id" },
               quotation_id: { $toObjectId: "$quotation_id" },
               bid_id: { $toObjectId: "$bid_id" },
@@ -571,6 +635,14 @@ module.exports = {
               localField: "product_id",
               foreignField: "_id",
               as: "products",
+            },
+          },
+          {
+            $lookup: {
+              from: "ads",
+              localField: "ad_id",
+              foreignField: "_id",
+              as: "ads",
             },
           },
           {
@@ -627,13 +699,25 @@ module.exports = {
 
         if (notification) {
           if (notification[0].type === "received_quotation") {
-            text = `Someone sent a quotation to your product ${notification[0].products[0].name}`;
+            if (notification[0].quotation[0].isAd) {
+              text = `Someone sent a quotation to your ad ${notification[0].ads[0].name}`;
+            } else {
+              text = `Someone sent a quotation to your product ${notification[0].products[0].name}`;
+            }
           }
           if (notification[0].type === "accepted_quotation") {
-            text = `Someone accepted a quotation of your product ${notification[0].products[0].name}`;
+            if (notification[0].quotation[0].isAd) {
+              text = `Someone accepted a quotation of your ad ${notification[0].ads[0].name}`;
+            } else {
+              text = `Someone accepted a quotation of your product ${notification[0].products[0].name}`;
+            }
           }
           if (notification[0].type === "rejected_quotation") {
-            text = `Someone rejected a quotation of your product ${notification[0].products[0].name}`;
+            if (notification[0].quotation[0].isAd) {
+              text = `Someone rejected a quotation of your ad ${notification[0].ads[0].name}`;
+            } else {
+              text = `Someone rejected a quotation of your product ${notification[0].products[0].name}`;
+            }
           }
           if (notification[0].type === "visited") {
             if (notification[0].visitor[0].user_type === "Buyer") {
