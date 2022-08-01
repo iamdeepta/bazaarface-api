@@ -21,6 +21,7 @@ const notifications = gql`
     bid_id: String
     bid: [Bid]
     text: String!
+    type: String
     seen_status: Int
     status: Int
     buyers: [SingleBuyer]
