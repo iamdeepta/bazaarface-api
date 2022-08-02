@@ -40,16 +40,26 @@ const user = gql`
     cover_image: String
     description: String
     designation: String
-    followers: [String]
-    following: [String]
+    followers: [Follower]
+    following: [Following]
   }
 
   type SingleSeller {
     profile_image: String
     cover_image: String
     description: String
-    followers: [String]
-    following: [String]
+    followers: [Follower]
+    following: [Following]
+  }
+
+  type Follower {
+    user_id: String
+    user_type: String
+  }
+
+  type Following {
+    user_id: String
+    user_type: String
   }
 
   type successInfo {
