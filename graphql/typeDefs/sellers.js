@@ -12,12 +12,22 @@ const sellers = gql`
     key_facts: KeyFacts
     ref_customers: [String]
     services: [Services]
-    followers: [String]
-    following: [String]
+    followers: [Follower]
+    following: [Following]
     total_followers: Int
     total_following: Int
     message: String
     success: Boolean
+  }
+
+  type Follower {
+    user_id: String
+    user_type: String
+  }
+
+  type Following {
+    user_id: String
+    user_type: String
   }
 
   type KeyFacts {
