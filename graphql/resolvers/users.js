@@ -206,174 +206,103 @@ module.exports = {
     async getPeopleYouMayKnow(parent, args, context) {
       const { user_id, user_type } = args;
 
-      var following_user_id = [user_id];
-      var following_user_type = [user_type];
-      //   console.log(following_user_type.includes("as"));
-
-      //fetching following users for displaying their posts
-      if (user_type === "Seller") {
-        const seller = await Seller.findOne({ user_id: user_id });
-        for (var i = 0; i < seller.following.length; i++) {
-          if (seller.following[i].user_type === "Seller") {
-            const seller_others = await Seller.findOne({
-              user_id: seller.following[i].user_id,
-              user_type: seller.following[i].user_type,
-            });
-            if (seller_others.user_id !== user_id) {
-              following_user_id.push(seller_others.user_id);
-              //check if user type is already in an array
-              if (!following_user_type.includes(seller_others.user_type)) {
-                following_user_type.push(seller_others.user_type);
-              }
-            }
-          } else {
-            const seller_others = await Buyer.findOne({
-              user_id: seller.following[i].user_id,
-              user_type: seller.following[i].user_type,
-            });
-            if (seller_others.user_id !== user_id) {
-              following_user_id.push(seller_others.user_id);
-              //check if user type is already in an array
-              if (!following_user_type.includes(seller_others.user_type)) {
-                following_user_type.push(seller_others.user_type);
-              }
-            }
-          }
-        }
-      } else {
-        const buyer = await Buyer.findOne({ user_id: user_id });
-        for (var i = 0; i < buyer.following.length; i++) {
-          if (buyer.following[i].user_type === "Buyer") {
-            const buyer_others = await Buyer.findOne({
-              user_id: buyer.following[i].user_id,
-              user_type: buyer.following[i].user_type,
-            });
-            if (buyer_others.user_id !== user_id) {
-              following_user_id.push(buyer_others.user_id);
-              //check if user type is already in an array
-              if (!following_user_type.includes(buyer_others.user_type)) {
-                following_user_type.push(buyer_others.user_type);
-              }
-            }
-          } else {
-            const buyer_others = await Seller.findOne({
-              user_id: buyer.following[i].user_id,
-              user_type: buyer.following[i].user_type,
-            });
-            if (buyer_others.user_id !== user_id) {
-              following_user_id.push(buyer_others.user_id);
-              //check if user type is already in an array
-              if (!following_user_type.includes(buyer_others.user_type)) {
-                following_user_type.push(buyer_others.user_type);
-              }
-            }
-          }
-        }
-      }
-
-      var updates = {};
-
-      if (user_id !== undefined) {
-        //updates.user_id = user_id;
-        updates.user_id = { $nin: following_user_id };
-      }
-      if (user_type !== undefined) {
-        //updates.user_type = user_type;
-        updates.user_type = { $nin: following_user_type };
-      }
-
       try {
         var users = [];
 
-        const user = await Seller.aggregate([
-          { $match: updates },
-          {
-            $addFields: {
-              user_id: { $toObjectId: "$user_id" },
-              users_id: { $toString: "$user_id" },
+        if (user_type === "Seller") {
+          const user = await Buyer.aggregate([
+            { $match: { user_id: { $ne: user_id } } },
+            {
+              $addFields: {
+                user_id: { $toObjectId: "$user_id" },
+                users_id: { $toString: "$user_id" },
+              },
             },
-          },
-          {
-            $lookup: {
-              from: "users",
-              localField: "user_id",
-              foreignField: "_id",
-              as: "users",
+            {
+              $lookup: {
+                from: "users",
+                localField: "user_id",
+                foreignField: "_id",
+                as: "users",
+              },
             },
-          },
-          // {
-          //   $lookup: {
-          //     from: "sellers",
-          //     localField: "users_id",
-          //     foreignField: "user_id",
-          //     as: "sellers",
-          //   },
-          // },
-          {
-            $lookup: {
-              from: "buyers",
-              localField: "users_id",
-              foreignField: "user_id",
-              as: "buyers",
+            // {
+            //   $lookup: {
+            //     from: "sellers",
+            //     localField: "users_id",
+            //     foreignField: "user_id",
+            //     as: "sellers",
+            //   },
+            // },
+            {
+              $lookup: {
+                from: "sellers",
+                localField: "users_id",
+                foreignField: "user_id",
+                as: "sellers",
+              },
             },
-          },
-          { $sample: { size: 6 } },
-        ]);
+            { $sample: { size: 6 } },
+          ]);
 
-        const buyer = await Buyer.aggregate([
-          { $match: updates },
-          {
-            $addFields: {
-              user_id: { $toObjectId: "$user_id" },
-              users_id: { $toString: "$user_id" },
-            },
-          },
-          {
-            $lookup: {
-              from: "users",
-              localField: "user_id",
-              foreignField: "_id",
-              as: "users",
-            },
-          },
-          {
-            $lookup: {
-              from: "sellers",
-              localField: "users_id",
-              foreignField: "user_id",
-              as: "sellers",
-            },
-          },
-          // {
-          //   $lookup: {
-          //     from: "buyers",
-          //     localField: "users_id",
-          //     foreignField: "user_id",
-          //     as: "buyers",
-          //   },
-          // },
-          { $sample: { size: 6 } },
-        ]);
-
-        if (user) {
-          for (var i = 0; i < user.length; i++) {
-            users.push({
-              ...user[i],
-              id: user[i]._id,
-              user_type: user[i].user_type,
-              user_id: user[i].user_id,
-            });
+          if (user) {
+            for (var i = 0; i < user.length; i++) {
+              users.push({
+                ...user[i],
+                id: user[i]._id,
+                user_type: user[i].user_type,
+                user_id: user[i].user_id,
+                profile_image: user[i].profile_image,
+                designation: user[i].designation,
+              });
+            }
           }
-        }
+        } else {
+          const user = await Seller.aggregate([
+            { $match: { user_id: { $ne: user_id } } },
+            {
+              $addFields: {
+                user_id: { $toObjectId: "$user_id" },
+                users_id: { $toString: "$user_id" },
+              },
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "user_id",
+                foreignField: "_id",
+                as: "users",
+              },
+            },
+            {
+              $lookup: {
+                from: "buyers",
+                localField: "users_id",
+                foreignField: "user_id",
+                as: "buyers",
+              },
+            },
+            // {
+            //   $lookup: {
+            //     from: "buyers",
+            //     localField: "users_id",
+            //     foreignField: "user_id",
+            //     as: "buyers",
+            //   },
+            // },
+            { $sample: { size: 6 } },
+          ]);
 
-        if (buyer) {
-          for (var i = 0; i < buyer.length; i++) {
-            users.push({
-              ...buyer[i],
-              id: buyer[i]._id,
-              user_type: buyer[i].user_type,
-              user_id: buyer[i].user_id,
-            });
+          if (user) {
+            for (var i = 0; i < user.length; i++) {
+              users.push({
+                ...user[i],
+                id: user[i]._id,
+                user_type: user[i].user_type,
+                user_id: user[i].user_id,
+                profile_image: user[i].profile_image,
+              });
+            }
           }
         }
 

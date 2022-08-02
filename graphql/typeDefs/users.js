@@ -41,6 +41,8 @@ const user = gql`
     user_type: String!
     seller_id: String
     buyer_id: String
+    profile_image: String
+    designation: String
     user: User
     users: [SingleUser]
     buyers: [SingleBuyer]
