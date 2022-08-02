@@ -35,6 +35,20 @@ const user = gql`
     status: Int
   }
 
+  type PeopleYouMayKnow {
+    id: ID!
+    user_id: String!
+    user_type: String!
+    seller_id: String
+    buyer_id: String
+    user: User
+    users: [SingleUser]
+    buyers: [SingleBuyer]
+    sellers: [SingleSeller]
+    message: String
+    success: Boolean
+  }
+
   type SingleBuyer {
     profile_image: String
     cover_image: String
@@ -50,6 +64,14 @@ const user = gql`
     description: String
     followers: [Follower]
     following: [Following]
+  }
+
+  type SingleUser {
+    firstname: String
+    lastname: String
+    company_name: String
+    city: String
+    country: String
   }
 
   type Follower {
@@ -143,6 +165,7 @@ const user = gql`
     getUsers: [User]
     getUser(userId: ID!): User
     getTotalUser: Int
+    getPeopleYouMayKnow(user_id: String, user_type: String): [PeopleYouMayKnow]
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
