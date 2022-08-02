@@ -119,6 +119,13 @@ const sellers = gql`
 
     updateSellerFollowers(id: ID!, follow_id: ID!, user_id: ID!): Sellers
     updateSellerUnfollow(id: ID!, follow_id: ID!, user_id: ID!): Sellers
+
+    addFollowers(
+      user_id: String
+      user_type: String
+      receiver_id: String
+      receiver_user_type: String
+    ): successInfoSeller
   }
 `;
 

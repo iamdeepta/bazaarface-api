@@ -141,6 +141,7 @@ const user = gql`
     updateUser(userId: ID, updateUserInput: UpdateUserInput): User
     deleteUser(userId: ID!): String!
     googleAuth(input: authInput): successInfo
+    confirmForgotOtp(email: String, otp: String): successInfo
     getForgotOtp(email: String!): forgotOtp
     resetPassword(input: ResetPasswordInput): resetPassword
     uploadObject(email: String!, file: Upload!, bucketName: String!): Object

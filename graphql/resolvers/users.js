@@ -714,6 +714,30 @@ module.exports = {
       }
     },
 
+    //confirm forgot otp
+    async confirmForgotOtp(parent, args, context, info) {
+      //const user_check = await checkAuth(context);
+      //const { userId } = args;
+      const { email, otp } = args;
+
+      //otp verification
+      const user_otp = await Otp.findOne({ email, otp }).sort({
+        createdAt: -1,
+      });
+      if (!user_otp) {
+        throw new UserInputError("You entered wrong otp", {
+          errors: {
+            otp: "You entered wrong otp",
+          },
+        });
+      } else {
+        return {
+          message: "Otp matched.",
+          success: false,
+        };
+      }
+    },
+
     //upload profile image
     uploadObject: (_, { email, file, bucketName }) =>
       new ImageResolver().uploadObject(email, file, bucketName),

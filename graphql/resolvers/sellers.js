@@ -350,5 +350,346 @@ module.exports = {
         throw new UserInputError("Errors occcur while unfollowing");
       }
     },
+
+    //add followers
+    async addFollowers(parent, args, context, info) {
+      const user_check = await checkAuth(context);
+      const { user_id, user_type, receiver_id, receiver_user_type } = args;
+
+      // TODO: Make sure user doesnt already exist
+      try {
+        if (receiver_user_type === "Seller") {
+          const sellers = await Seller.findOne({
+            user_id: receiver_id,
+            user_type: receiver_user_type,
+          });
+          //check if an object is present in array
+          const isFound = sellers.followers.some((element) => {
+            if (
+              element.user_id === user_id &&
+              element.user_type === user_type
+            ) {
+              return true;
+            }
+
+            return false;
+          });
+
+          // if (user_check.isAdmin) {
+          if (isFound === false) {
+            const seller = await Seller.findOneAndUpdate(
+              { user_id: receiver_id, user_type: receiver_user_type },
+              {
+                $push: {
+                  followers: { $each: [{ user_id, user_type }], $position: 0 },
+                },
+              },
+              { new: true }
+            );
+
+            if (user_type === "Seller") {
+              const followings = await Seller.findOneAndUpdate(
+                { user_id, user_type },
+                {
+                  $push: {
+                    following: {
+                      $each: [
+                        { user_id: receiver_id, user_type: receiver_user_type },
+                      ],
+                      $position: 0,
+                    },
+                  },
+                },
+                { new: true }
+              );
+            } else {
+              const followings = await Buyer.findOneAndUpdate(
+                { user_id, user_type },
+                {
+                  $push: {
+                    following: {
+                      $each: [
+                        { user_id: receiver_id, user_type: receiver_user_type },
+                      ],
+                      $position: 0,
+                    },
+                  },
+                },
+                { new: true }
+              );
+            }
+
+            // if (seller && user_type === "Buyer") {
+            //   //send activity
+            //   if (user_check.id !== post.user_id) {
+            //     var post_id = post._id.toString();
+            //     const activity = new BuyerActivities({
+            //       type: "like_post",
+            //       visitor_id: post.user_id,
+            //       user_id: user_id,
+            //       visitor_user_type: post.user_type,
+            //       user_type: user_type,
+            //       post_id: post_id,
+            //       text: "You liked a post",
+            //     });
+
+            //     const res_activity = await activity.save();
+            //   }
+            // }
+
+            return {
+              ...seller._doc,
+              message: "You followed this user.",
+              success: true,
+            };
+          } else {
+            const seller = await Seller.findOneAndUpdate(
+              { user_id: receiver_id, user_type: receiver_user_type },
+              {
+                $pull: {
+                  followers: { user_id, user_type },
+                },
+              },
+              { new: true }
+            );
+
+            if (user_type === "Seller") {
+              const followings = await Seller.findOneAndUpdate(
+                { user_id, user_type },
+                {
+                  $pull: {
+                    following: {
+                      user_id: receiver_id,
+                      user_type: receiver_user_type,
+                    },
+                  },
+                },
+                { new: true }
+              );
+            } else {
+              const followings = await Buyer.findOneAndUpdate(
+                { user_id, user_type },
+                {
+                  $pull: {
+                    following: {
+                      user_id: receiver_id,
+                      user_type: receiver_user_type,
+                    },
+                  },
+                },
+                { new: true }
+              );
+            }
+
+            // if (seller && user_type === "Buyer") {
+            //   //send activity
+            //   if (user_check.id !== post.user_id) {
+            //     var post_id = post._id.toString();
+            //     const activity = new BuyerActivities({
+            //       type: "like_post",
+            //       visitor_id: post.user_id,
+            //       user_id: user_id,
+            //       visitor_user_type: post.user_type,
+            //       user_type: user_type,
+            //       post_id: post_id,
+            //       text: "You liked a post",
+            //     });
+
+            //     const res_activity = await activity.save();
+            //   }
+            // }
+
+            return {
+              ...seller._doc,
+              message: "You unfollowed this user.",
+              success: true,
+            };
+            // const seller = await Seller.findOneAndUpdate(
+            //   { user_id: receiver_id, user_type: receiver_user_type },
+            //   {
+            //     $pull: {
+            //       followers: { user_id, user_type },
+            //     },
+            //   },
+            //   { new: true }
+            // );
+            // return {
+            //   ...seller._doc,
+            //   message: "You disliked this post.",
+            //   success: true,
+            // };
+          }
+        } else {
+          // for buyer followers
+
+          const buyers = await Buyer.findOne({
+            user_id: receiver_id,
+            user_type: receiver_user_type,
+          });
+          //check if an object is present in array
+          const isFound = buyers.followers.some((element) => {
+            if (
+              element.user_id === user_id &&
+              element.user_type === user_type
+            ) {
+              return true;
+            }
+
+            return false;
+          });
+
+          // if (user_check.isAdmin) {
+          if (isFound === false) {
+            const buyer = await Buyer.findOneAndUpdate(
+              { user_id: receiver_id, user_type: receiver_user_type },
+              {
+                $push: {
+                  followers: { $each: [{ user_id, user_type }], $position: 0 },
+                },
+              },
+              { new: true }
+            );
+
+            if (user_type === "Seller") {
+              const followings = await Seller.findOneAndUpdate(
+                { user_id, user_type },
+                {
+                  $push: {
+                    following: {
+                      $each: [
+                        { user_id: receiver_id, user_type: receiver_user_type },
+                      ],
+                      $position: 0,
+                    },
+                  },
+                },
+                { new: true }
+              );
+            } else {
+              const followings = await Buyer.findOneAndUpdate(
+                { user_id, user_type },
+                {
+                  $push: {
+                    following: {
+                      $each: [
+                        { user_id: receiver_id, user_type: receiver_user_type },
+                      ],
+                      $position: 0,
+                    },
+                  },
+                },
+                { new: true }
+              );
+            }
+
+            // if (seller && user_type === "Buyer") {
+            //   //send activity
+            //   if (user_check.id !== post.user_id) {
+            //     var post_id = post._id.toString();
+            //     const activity = new BuyerActivities({
+            //       type: "like_post",
+            //       visitor_id: post.user_id,
+            //       user_id: user_id,
+            //       visitor_user_type: post.user_type,
+            //       user_type: user_type,
+            //       post_id: post_id,
+            //       text: "You liked a post",
+            //     });
+
+            //     const res_activity = await activity.save();
+            //   }
+            // }
+
+            return {
+              ...buyer._doc,
+              message: "You followed this user.",
+              success: true,
+            };
+          } else {
+            const buyer = await Buyer.findOneAndUpdate(
+              { user_id: receiver_id, user_type: receiver_user_type },
+              {
+                $pull: {
+                  followers: { user_id, user_type },
+                },
+              },
+              { new: true }
+            );
+
+            if (user_type === "Seller") {
+              const followings = await Seller.findOneAndUpdate(
+                { user_id, user_type },
+                {
+                  $pull: {
+                    following: {
+                      user_id: receiver_id,
+                      user_type: receiver_user_type,
+                    },
+                  },
+                },
+                { new: true }
+              );
+            } else {
+              const followings = await Buyer.findOneAndUpdate(
+                { user_id, user_type },
+                {
+                  $pull: {
+                    following: {
+                      user_id: receiver_id,
+                      user_type: receiver_user_type,
+                    },
+                  },
+                },
+                { new: true }
+              );
+            }
+
+            // if (seller && user_type === "Buyer") {
+            //   //send activity
+            //   if (user_check.id !== post.user_id) {
+            //     var post_id = post._id.toString();
+            //     const activity = new BuyerActivities({
+            //       type: "like_post",
+            //       visitor_id: post.user_id,
+            //       user_id: user_id,
+            //       visitor_user_type: post.user_type,
+            //       user_type: user_type,
+            //       post_id: post_id,
+            //       text: "You liked a post",
+            //     });
+
+            //     const res_activity = await activity.save();
+            //   }
+            // }
+
+            return {
+              ...buyer._doc,
+              message: "You unfollowed this user.",
+              success: true,
+            };
+            // const seller = await Seller.findOneAndUpdate(
+            //   { user_id: receiver_id, user_type: receiver_user_type },
+            //   {
+            //     $pull: {
+            //       followers: { user_id, user_type },
+            //     },
+            //   },
+            //   { new: true }
+            // );
+            // return {
+            //   ...seller._doc,
+            //   message: "You disliked this post.",
+            //   success: true,
+            // };
+          }
+        }
+        // } else {
+        //   throw new AuthenticationError("Action not allowed");
+        // }
+      } catch (err) {
+        //throw new UserInputError("Errors", { errors });
+        throw new UserInputError("Errors occcur while following user");
+      }
+    },
   },
 };
