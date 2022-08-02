@@ -30,24 +30,58 @@ module.exports = {
       if (user_type === "Seller") {
         const seller = await Seller.findOne({ user_id: user_id });
         for (var i = 0; i < seller.following.length; i++) {
-          const seller_others = await Seller.findById(seller.following[i]);
-          if (seller_others.user_id !== user_id) {
-            following_user_id.push(seller_others.user_id);
-            //check if user type is already in an array
-            if (!following_user_type.includes(seller_others.user_type)) {
-              following_user_type.push(seller_others.user_type);
+          if (seller.following[i].user_type === "Seller") {
+            const seller_others = await Seller.findOne({
+              user_id: seller.following[i].user_id,
+              user_type: seller.following[i].user_type,
+            });
+            if (seller_others.user_id !== user_id) {
+              following_user_id.push(seller_others.user_id);
+              //check if user type is already in an array
+              if (!following_user_type.includes(seller_others.user_type)) {
+                following_user_type.push(seller_others.user_type);
+              }
+            }
+          } else {
+            const seller_others = await Buyer.findOne({
+              user_id: seller.following[i].user_id,
+              user_type: seller.following[i].user_type,
+            });
+            if (seller_others.user_id !== user_id) {
+              following_user_id.push(seller_others.user_id);
+              //check if user type is already in an array
+              if (!following_user_type.includes(seller_others.user_type)) {
+                following_user_type.push(seller_others.user_type);
+              }
             }
           }
         }
       } else {
         const buyer = await Buyer.findOne({ user_id: user_id });
         for (var i = 0; i < buyer.following.length; i++) {
-          const buyer_others = await Buyer.findById(buyer.following[i]);
-          if (buyer_others.user_id !== user_id) {
-            following_user_id.push(buyer_others.user_id);
-            //check if user type is already in an array
-            if (!following_user_type.includes(buyer_others.user_type)) {
-              following_user_type.push(seller_others.user_type);
+          if (buyer.following[i].user_type === "Buyer") {
+            const buyer_others = await Buyer.findOne({
+              user_id: buyer.following[i].user_id,
+              user_type: buyer.following[i].user_type,
+            });
+            if (buyer_others.user_id !== user_id) {
+              following_user_id.push(buyer_others.user_id);
+              //check if user type is already in an array
+              if (!following_user_type.includes(buyer_others.user_type)) {
+                following_user_type.push(buyer_others.user_type);
+              }
+            }
+          } else {
+            const buyer_others = await Seller.findOne({
+              user_id: buyer.following[i].user_id,
+              user_type: buyer.following[i].user_type,
+            });
+            if (buyer_others.user_id !== user_id) {
+              following_user_id.push(buyer_others.user_id);
+              //check if user type is already in an array
+              if (!following_user_type.includes(buyer_others.user_type)) {
+                following_user_type.push(buyer_others.user_type);
+              }
             }
           }
         }
@@ -113,6 +147,8 @@ module.exports = {
             },
           },
         ]).sort({ createdAt: -1 });
+
+        console.log(post);
 
         for (var i = 0; i < post.length; i++) {
           //get users name and pic who like the post
