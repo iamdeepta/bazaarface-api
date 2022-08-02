@@ -132,6 +132,8 @@ module.exports = {
                 user_id: post[i].likes[j].user_id,
               });
               likes.push({
+                user_id: post[i].likes[j].user_id,
+                user_type: post[i].likes[j].user_type,
                 like_name: user.firstname + " " + user.lastname,
                 like_image: buyer[0].profile_image,
               });
