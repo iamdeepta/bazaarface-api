@@ -13,14 +13,24 @@ const buyers = gql`
     user_type: String
     work_history: [WorkHistory]
     work_histories: [WorkHistories]
-    followers: [String]
-    following: [String]
+    followers: [Follower]
+    following: [Following]
     total_followers: Int
     total_following: Int
     users: [Users]
     country: String
     message: String
     success: Boolean
+  }
+
+  type Follower {
+    user_id: String
+    user_type: String
+  }
+
+  type Following {
+    user_id: String
+    user_type: String
   }
 
   type Users {
