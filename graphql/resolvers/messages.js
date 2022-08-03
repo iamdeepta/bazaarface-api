@@ -160,6 +160,7 @@ module.exports = {
                     conversations[j].receiver[0].lastname,
                   profile_image:
                     conversations[j].receiver_buyers[0].profile_image,
+                  user_type: conversations[j].receiver_user_type,
                 });
                 //console.log(convos);
                 //return convos;
@@ -175,6 +176,7 @@ module.exports = {
                   user_name: conversations[j].receiver[0].company_name,
                   profile_image:
                     conversations[j].receiver_sellers[0].profile_image,
+                  user_type: conversations[j].receiver_user_type,
                 });
                 //console.log(convos);
                 //return convos;
@@ -196,6 +198,7 @@ module.exports = {
                     " " +
                     conversations[j].sender[0].lastname,
                   profile_image: conversations[j].buyers[0].profile_image,
+                  user_type: conversations[j].sender_user_type,
                 });
                 //console.log(convos);
                 //return convos;
@@ -210,6 +213,7 @@ module.exports = {
                   ...conversations[j],
                   user_name: conversations[j].sender[0].company_name,
                   profile_image: conversations[j].sellers[0].profile_image,
+                  user_type: conversations[j].sender_user_type,
                 });
                 //console.log(convos);
                 //return convos;
@@ -232,6 +236,7 @@ module.exports = {
                     conversations[j].receiver[0].lastname,
                   profile_image:
                     conversations[j].receiver_buyers[0].profile_image,
+                  user_type: conversations[j].receiver_user_type,
                 });
                 //console.log(convos);
                 //return convos;
@@ -241,6 +246,7 @@ module.exports = {
                   user_name: conversations[j].receiver[0].company_name,
                   profile_image:
                     conversations[j].receiver_sellers[0].profile_image,
+                  user_type: conversations[j].receiver_user_type,
                 });
                 //console.log(convos);
                 //return convos;
@@ -256,6 +262,7 @@ module.exports = {
                     " " +
                     conversations[j].sender[0].lastname,
                   profile_image: conversations[j].buyers[0].profile_image,
+                  user_type: conversations[j].sender_user_type,
                 });
                 //console.log(convos);
                 //return convos;
@@ -264,6 +271,7 @@ module.exports = {
                   ...conversations[j],
                   user_name: conversations[j].sender[0].company_name,
                   profile_image: conversations[j].sellers[0].profile_image,
+                  user_type: conversations[j].sender_user_type,
                 });
                 //console.log(convos);
                 //return convos;

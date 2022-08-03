@@ -13,6 +13,7 @@ const messages = gql`
     sender_user_type: String
     receiver_user_type: String
     user_name: String
+    user_type: String
     profile_image: String
     status: Int
     buyers: [SingleBuyer]
