@@ -21,21 +21,39 @@ module.exports = {
   Query: {
     //get conversations
     async getConversations(parent, args, context) {
+      //const user_check = await await checkAuth(context);
+
       const { receiver_id, receiver_user_type, search_text } = args;
 
       try {
         var conversations = [];
+
         const conversation = await Conversation.aggregate([
           {
             $match: {
-              receiver_id: receiver_id,
-              receiver_user_type: receiver_user_type,
+              $or: [
+                {
+                  receiver_id: receiver_id,
+                  receiver_user_type: receiver_user_type,
+                },
+                {
+                  sender_id: receiver_id,
+                  sender_user_type: receiver_user_type,
+                },
+              ],
+
+              // $or: [
+              //   { receiver_user_type: receiver_user_type },
+              //   { sender_user_type: receiver_user_type },
+              // ],
             },
           },
           {
             $addFields: {
               sender_id: { $toObjectId: "$sender_id" },
               senders_id: { $toString: "$sender_id" },
+              receiver_id: { $toObjectId: "$receiver_id" },
+              receivers_id: { $toString: "$receiver_id" },
             },
           },
           {
@@ -63,7 +81,34 @@ module.exports = {
               as: "buyers",
             },
           },
+          {
+            $lookup: {
+              from: "users",
+              localField: "receiver_id",
+              foreignField: "_id",
+              as: "receiver",
+            },
+          },
+
+          {
+            $lookup: {
+              from: "sellers",
+              localField: "receivers_id",
+              foreignField: "user_id",
+              as: "receiver_sellers",
+            },
+          },
+          {
+            $lookup: {
+              from: "buyers",
+              localField: "receivers_id",
+              foreignField: "user_id",
+              as: "receiver_buyers",
+            },
+          },
         ]).sort({ createdAt: -1 });
+
+        //console.log(conversation);
 
         const seen_conversation = await Conversation.updateMany(
           { receiver_id: receiver_id, receiver_user_type: receiver_user_type },
@@ -73,6 +118,7 @@ module.exports = {
           { new: true }
         );
 
+        //show single message in convo list
         for (var i = 0; i < conversation.length; i++) {
           const message = await Message.find({
             conversation_id: conversation[0]._id,
@@ -92,35 +138,138 @@ module.exports = {
         }
         //console.log(conversations[0].users);
         //search by user name or company name
-
+        //console.log(conversations);
+        var convos = [];
         if (search_text.trim() !== "") {
-          var convos = [];
           for (var j = 0; j < conversations.length; j++) {
             if (
-              conversations[j].sender_user_type === "Buyer" &&
-              conversations[j].sender[0].firstname
-                .trim()
-                .toLowerCase()
-                .includes(search_text.trim().toLowerCase())
+              conversations[j].sender_id.toString() === receiver_id.toString()
             ) {
-              convos.push({ ...conversations[j] });
-              //console.log(convos);
-              //return convos;
+              if (
+                conversations[j].receiver_user_type === "Buyer" &&
+                conversations[j].receiver[0].firstname
+                  .trim()
+                  .toLowerCase()
+                  .includes(search_text.trim().toLowerCase())
+              ) {
+                convos.push({
+                  ...conversations[j],
+                  user_name:
+                    conversations[j].receiver[0].firstname +
+                    " " +
+                    conversations[j].receiver[0].lastname,
+                  profile_image:
+                    conversations[j].receiver_buyers[0].profile_image,
+                });
+                //console.log(convos);
+                //return convos;
+              } else if (
+                conversations[j].receiver_user_type === "Seller" &&
+                conversations[j].receiver[0].company_name
+                  .trim()
+                  .toLowerCase()
+                  .includes(search_text.trim().toLowerCase())
+              ) {
+                convos.push({
+                  ...conversations[j],
+                  user_name: conversations[j].receiver[0].company_name,
+                  profile_image:
+                    conversations[j].receiver_sellers[0].profile_image,
+                });
+                //console.log(convos);
+                //return convos;
+              }
             } else if (
-              conversations[j].sender_user_type === "Seller" &&
-              conversations[j].sender[0].company_name
-                .trim()
-                .toLowerCase()
-                .includes(search_text.trim().toLowerCase())
+              conversations[j].receiver_id.toString() === receiver_id.toString()
             ) {
-              convos.push({ ...conversations[j] });
-              //console.log(convos);
-              //return convos;
+              if (
+                conversations[j].sender_user_type === "Buyer" &&
+                conversations[j].sender[0].firstname
+                  .trim()
+                  .toLowerCase()
+                  .includes(search_text.trim().toLowerCase())
+              ) {
+                convos.push({
+                  ...conversations[j],
+                  user_name:
+                    conversations[j].sender[0].firstname +
+                    " " +
+                    conversations[j].sender[0].lastname,
+                  profile_image: conversations[j].buyers[0].profile_image,
+                });
+                //console.log(convos);
+                //return convos;
+              } else if (
+                conversations[j].sender_user_type === "Seller" &&
+                conversations[j].sender[0].company_name
+                  .trim()
+                  .toLowerCase()
+                  .includes(search_text.trim().toLowerCase())
+              ) {
+                convos.push({
+                  ...conversations[j],
+                  user_name: conversations[j].sender[0].company_name,
+                  profile_image: conversations[j].sellers[0].profile_image,
+                });
+                //console.log(convos);
+                //return convos;
+              }
             }
           }
         } else {
+          //if search field is empty
           //console.log(conversations);
-          convos = conversations;
+          for (var j = 0; j < conversations.length; j++) {
+            if (
+              conversations[j].sender_id.toString() === receiver_id.toString()
+            ) {
+              if (conversations[j].receiver_user_type === "Buyer") {
+                convos.push({
+                  ...conversations[j],
+                  user_name:
+                    conversations[j].receiver[0].firstname +
+                    " " +
+                    conversations[j].receiver[0].lastname,
+                  profile_image:
+                    conversations[j].receiver_buyers[0].profile_image,
+                });
+                //console.log(convos);
+                //return convos;
+              } else if (conversations[j].receiver_user_type === "Seller") {
+                convos.push({
+                  ...conversations[j],
+                  user_name: conversations[j].receiver[0].company_name,
+                  profile_image:
+                    conversations[j].receiver_sellers[0].profile_image,
+                });
+                //console.log(convos);
+                //return convos;
+              }
+            } else if (
+              conversations[j].receiver_id.toString() === receiver_id.toString()
+            ) {
+              if (conversations[j].sender_user_type === "Buyer") {
+                convos.push({
+                  ...conversations[j],
+                  user_name:
+                    conversations[j].sender[0].firstname +
+                    " " +
+                    conversations[j].sender[0].lastname,
+                  profile_image: conversations[j].buyers[0].profile_image,
+                });
+                //console.log(convos);
+                //return convos;
+              } else if (conversations[j].sender_user_type === "Seller") {
+                convos.push({
+                  ...conversations[j],
+                  user_name: conversations[j].sender[0].company_name,
+                  profile_image: conversations[j].sellers[0].profile_image,
+                });
+                //console.log(convos);
+                //return convos;
+              }
+            }
+          }
           //return convos;
         }
 

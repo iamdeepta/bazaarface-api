@@ -6,15 +6,19 @@ const messages = gql`
 
   type Conversations {
     id: ID!
-    sender_id: String!
+    sender_id: String
     sender: [User]
-    receiver_id: String!
+    receiver_id: String
     receiver: [User]
-    sender_user_type: String!
-    receiver_user_type: String!
+    sender_user_type: String
+    receiver_user_type: String
+    user_name: String
+    profile_image: String
     status: Int
     buyers: [SingleBuyer]
     sellers: [SingleSeller]
+    receiver_sellers: [SingleSeller]
+    receiver_buyers: [SingleBuyer]
     messages: [Messages]
     unread_message_count: Int
     message: String
